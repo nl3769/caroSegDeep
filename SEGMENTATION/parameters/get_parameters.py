@@ -1,10 +1,11 @@
-from parameters.parameters import Parameters
+from parameters.parameters_inference import Parameters
 import os
 from shutil import copyfile
 
 # ****************************************************************
 # *** HOWTO
 # ****************************************************************
+
 # 0) Do not modify this template file "setParameterstemplate.py"
 # 1) Create a new copy of this file "setParametersTemplate.py" and rename it into "setParameters.py"
 # 2) Indicate all the variables according to your local environment and experiment
@@ -17,31 +18,17 @@ def getParameters():
 
   p = Parameters(
 
-                PATH_TO_SEQUENCES='/home/nlaine/Documents/cluster/PROJECTS_IO/DATA/MEIBURGER/Images',     # Path where the sequences/images are saved (.tiff, .DICOM, .MAT)
-                PATH_TO_BORDERS='/home/nlaine/Documents/cluster/PROJECTS_IO/DATA/MEIBURGER/Borders',      # Path where the borders are saved (.MAT)
-                PATH_TO_CONTOURS='/home/nlaine/Documents/cluster/PROJECTS_IO/DATA/MEIBURGER/Contours',    # Path where the contours are saved (.MAT, .txt)
-                PATH_TO_CF='/home/nlaine/Documents/cluster/PROJECTS_IO/DATA/MEIBURGER/CF',
-                FOLD='fold1',                                                                            # The fold's name is used to load the correct model
-                PATH_TO_SAVE_EDUARDO_VIEWER='/home/nlaine/Documents/cluster/projects_results/carotid_segmentation_results/results_viewer_NL/caroSeg_MEIBURGER/laine',   # Path where data are stored and where the format matches with Eduardo viewer
-                PROCESS_FULL_SEQUENCE=False, # Segment all the frame of the sequence or only the first one
-                PATH_TO_SAVE_RESULTS_COMPRESSION='/home/nlaine/Documents/cluster/PROJECTS_IO/CONSORTIUM_MEIBURGER/SEGMENTATION/WALL_CAROTID_SEGMENTATION/RESULTS/COMPRESSION',
-                PATCH_HEIGHT=512, # The height of a patch
-                PATCH_WIDTH=128,  # The width of a patch
-                OVERLAPPING=8,    # Horizontal displacement of a patch
-                DESIRED_SPATIAL_RESOLUTION=5, # The desired spatial resolution in um
-
-                PATH_FAR_WALL_DETECTION_RES='/home/nlaine/Documents/cluster/PROJECTS_IO/CONSORTIUM_MEIBURGER/SEGMENTATION/FAR_WALL_CAROTID_DETECTION/RESULTS/',                  # Where the detection of the far wall was saved
-                PATH_TO_LOAD_TRAINED_MODEL_FAR_WALL='/home/nlaine/Documents/cluster/PROJECTS_IO/CONSORTIUM_MEIBURGER/SEGMENTATION/FAR_WALL_CAROTID_DETECTION/DATA',              # Path where the trained model is saved
-
-                PATH_TO_LOAD_TRAINED_MODEL_WALL='/home/nlaine/Documents/cluster/PROJECTS_IO/CONSORTIUM_MEIBURGER/SEGMENTATION/WALL_CAROTID_SEGMENTATION/DATA',               # Path where the trained model is saved
-                PATH_WALL_SEGMENTATION_RES='/home/nlaine/Documents/cluster/PROJECTS_IO/CONSORTIUM_MEIBURGER/SEGMENTATION/WALL_CAROTID_SEGMENTATION/RESULTS',
-
-                NAME_OF_TRAINED_MODEL='custom_dilated_unet.h5',                                                                                               # Name of the trained model
-
-                FLATTEN=False,                           # flatten image in order to apply dynamic progamming
-
-                MANUAL_FAR_WALL_DETECTION=False,          # if True then the home made GUI is used, else the prediction of the far wall are loaded
-                AUTOMATIC_METHOD=False                   # run the fully automatic method
+                PATH_TO_SEQUENCES='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/IMAGES',                    # Path where the sequences/images are saved (.tiff, .DICOM, .MAT)
+                PATH_TO_BORDERS='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/BORDERS',                     # Path where the borders are saved (.MAT)
+                PATH_TO_CONTOURS='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/CONTOURS',                   # Path where the contours are saved (.MAT, .txt)
+                PATH_TO_CF='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/CF',
+                PROCESS_FULL_SEQUENCE=False,        # Segment all the frame of the sequence or only the first one
+                PATCH_HEIGHT=512,                   # The height of a patch
+                PATCH_WIDTH=128,                    # The width of a patch
+                OVERLAPPING=8,                      # Horizontal displacement of a patch
+                DESIRED_SPATIAL_RESOLUTION=5,       # The desired spatial resolution in um
+                PATH_WALL_SEGMENTATION_RES='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/INFERENCE',         # Path to save results
+                PATH_TO_LOAD_TRAINED_MODEL_WALL='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/TRAINED_MODEL',        # Path where the trained model is saved
   )
 
   # --- Print all attributes in the console
@@ -50,10 +37,10 @@ def getParameters():
   print('----------------------------------------------------------------')
 
   # --- Save a backup of the parameters so it can be tracked on Git, without requiring to be adapted by from other contributors
-  copyfile(os.path.join('parameters', 'set_parameters.py'), os.path.join('parameters', 'get_parameters.py'))
+  copyfile(os.path.join('parameters', os.path.basename(__file__)), os.path.join('parameters', 'get_parameters_inference.py'))
 
   # --- Modify the function name from "setParameters" to "getParameters"
-  fid = open(os.path.join('parameters', 'get_parameters.py'), 'rt')
+  fid = open(os.path.join('parameters', 'get_parameters_inference.py'), 'rt')
   data = fid.read()
   data = data.replace('getParameters()', 'getParameters()')
   fid.close()

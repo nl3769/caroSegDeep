@@ -1,183 +1,193 @@
-from classes.prediction import predictionClass
-# from classes.annotation import annotationClassTmp
-from classes.annotationSemiAuto import annotationClass
-from functions.LoadDatas import LoadDICOMSequence
+import os
+
+from classes_wall.prediction import predictionClass
+from common.annotation import annotationClass
+from functions.load_datas import LoadData
 
 import numpy as np
-import cv2
 import matplotlib.pyplot as plt
 
 class sequenceClass():
 
     def __init__(self,
                  sequencePath,
-                 pathAnnotation,
-                 names,
                  pathBorders,
-                 fullSq=False):
+                 patientName,
+                 p):
 
-        '''
+        self.desiredSpatialResolution = p.DESIRED_SPATIAL_RESOLUTION
+        self.fullSq = p.PROCESS_FULL_SEQUENCE
+        self.patchHeight = p.PATCH_HEIGHT
+        self.patchWidth = p.PATCH_WIDTH
+        self.overlay = p.OVERLAPPING
 
-        ----------------- Parameters -----------------
+        self.sequence, self.scale, self.spacing, self.firstFrame = LoadData(sequence = sequencePath, spatialResolution = self.desiredSpatialResolution, fullSequence = self.fullSq, p=p)    # we load the sequence
+        self.annotationClass = annotationClass(self.sequence.shape, pathBorders, self.firstFrame, self.scale, p = p, patientName=patientName, overlay=self.overlay)            # self.annotationClass contains the sequence with the annotations
+        self.predictionClass = predictionClass(self.sequence.shape, self.patchHeight, self.patchWidth, self.annotationClass.bordersROI, p = p, img=self.sequence[0,])                                 # self.predictionClass contains the sequence with the prediction (overlayMap + preiction Map)
 
-        param: sequencePath: path to load the sequence
-        param: sequencePath: path to load the annotation.   ##Todo: It will the removed later
-        param: names: name of the patient.                  ##Todo: It will the removed later
-        param: pathBorders:                                 ##Todo: It will the removed later
-        param: fullSq: if the fullSq=True then all the image of the sequence is segmented and only the first frame if fullSq=False. By default, fullSq=False
-
-
-        ----------------- Attributes -----------------
-
-        param: self.desiredYSpacing: the desired spatial resolution in um
-        param: self.fullSq: if we segment the first frame or the entire sequence (False or True)
-        param: self.patchHeight: height of the patch
-        param: self.pathWidth: width of the patch
-        param: self.overlay: defined how much pixel does the patch is moved to the right
-        param: self.sequence: rescaled sequence to reach a vertical spacing of self.desiredYSpacing
-        param: self.scale: scale coefficient to reach a vertical spacing of self.desiredYSpacing
-        param: self.spacing:  the original spacing of the sequence
-        param: self.firstFrame: the original first frame of the sequence
-        param: self.annotationClass: annotationClass object according to the sequence's characteristics
-        param: self.predictionClass: predictionClass object according to the sequence's characteristics
-        param: self.step: refers to the number of pacthes extracted in one image
-        param: self.currentFrame: refers to the processed frame
-
-
-        ----------------- Methods -----------------
-
-        self.LaunchSegmentation
-        self.extractPatch
-        self.ComputeIMT
-        '''
-
-        self.desiredYSpacing = 5
-        self.fullSq = fullSq
-
-        self.patchHeight = 512
-        self.pathWidth = 128
-
-        self.overlay = 15
-
-        self.sequence, self.scale, self.spacing, self.firstFrame = LoadDICOMSequence(sequence=sequencePath,
-                                                                                               spatialResolution=self.desiredYSpacing,
-                                                                                               fullSequence=self.fullSq)
-
-        self.annotationClass = annotationClass(annotationPath=pathAnnotation,
-                                                  nameAnnotation=names,
-                                                  dimension=self.sequence.shape,
-                                                  borderPath=pathBorders,
-                                                  firstFrame=self.firstFrame,
-                                                  scale=self.scale)
-
-
-        self.predictionClass = predictionClass(dimensions=self.sequence.shape,
-                                               patchHeight=self.patchHeight,
-                                               patchWidth=self.pathWidth)
-
-        self.step = 0
+        self.patch = np.empty((self.patchWidth, self.patchHeight), dtype=np.float32)                                         # the patch
+        self.patchPosition = []                                                                                              # patch position (top left)
+        self.step = 0                                                                                                        # number of steps
         self.currentFrame = 0
 
+        self.finalMaskAfterPostProcessing = np.zeros(self.sequence.shape[1:])
 
+    # ------------------------------------------------------------------------------------------------------------------------------------
 
-    def LaunchSegmentation(self):
+    def launch_segmentation_dynamic_vertical_scan(self):
 
         '''
-        We launch the segmentation.
-        All the frame of the sequence are segmented through a cine loop. It is possible to segment only the first by setting self.fullSq=False.
+        At each position, three patches are extracted, and if the difference between the min and the max then the vertical scanning is automacally adjusted.
         '''
 
-        # ----  condition give the information if the segmentation of a frame is over
         condition = True
 
-        # ---- loop over the sequence
+        import time
+        t = time.time()
         for frameID in range(self.sequence.shape[0]):
 
-            # ---- we initialize these variables at the beginning of the image
             self.currentFrame = frameID
             self.predictionClass.patches = []
             self.step = 0
-
+            y_pos_list = []
+            median = (self.annotationClass.mapAnnotation[frameID, :, 0] + self.annotationClass.mapAnnotation[frameID, :, 1]) / 2
+            vertical_scanning = True
+            # --- condition give the information if the frame is segmented
             while (condition == True):
 
-                # ---- initialization step
-                if (self.step == 0):
-                    x = self.annotationClass.borders['leftBorder']
+                if (self.step == 0):  # initialization step
+                    x = self.initialization_step()
                     tmpOverlay = self.overlay
 
-                # ---- y is an integer and the center is centered around the vertical coordinate
-                y = self.annotationClass.yPosition(xLeft=x,
-                                                   width=self.pathWidth,
-                                                   height=self.patchHeight,
-                                                   frameID=self.currentFrame)
+                median_min = np.min(median[x:x+self.patchWidth])
+                median_max = np.max(median[x:x+self.patchWidth])
 
-                # ---- in self.predictionClass.patches are stored the patches at different (x,y) coordinates
-                self.predictionClass.patches.append({"patch": self.extractPatch(x, y),
-                                                     "frameID": self.currentFrame,
-                                                      "Step": self.step,
-                                                      "Overlay": tmpOverlay,
-                                                      "(x, y)": (x, y)})
+                y_mean, _, _ = self.annotationClass.yPosition(xLeft=x,
+                                                              width=self.patchWidth,
+                                                              height=self.patchHeight,
+                                                              map=self.annotationClass.mapAnnotation[frameID,])
+
+                y_pos = y_mean
+
+                # --- by default, we take three patches for one given x position
+                if 768 > 2*100 + median_max-median_min:
+
+                    self.predictionClass.patches.append({"patch": self.extract_patch(x, y_pos, image = self.sequence[frameID,]),
+                                                         "frameID": frameID,
+                                                         "Step": self.step,
+                                                         "Overlay": tmpOverlay,
+                                                         "(x, y)": (x, y_pos)})
+                    y_pos_list.append(self.predictionClass.patches[-1]["(x, y)"][-1])
+
+                    if y_mean - 128 > 0:
+                        y_pos = y_mean + 128
+                        self.predictionClass.patches.append({"patch": self.extract_patch(x, y_pos, image = self.sequence[frameID,]),
+                                                             "frameID": frameID,
+                                                             "Step": self.step,
+                                                             "Overlay": tmpOverlay,
+                                                             "(x, y)": (x, y_pos)})
+                        y_pos_list.append(self.predictionClass.patches[-1]["(x, y)"][-1])
+                    if y_mean < self.sequence.shape[1] - 1 :
+                        y_pos = y_mean - 128
+                        self.predictionClass.patches.append(
+                            {"patch": self.extract_patch(x, y_pos, image=self.sequence[frameID,]),
+                             "frameID": frameID,
+                             "Step": self.step,
+                             "Overlay": tmpOverlay,
+                             "(x, y)": (x, y_pos)})
+                        y_pos_list.append(self.predictionClass.patches[-1]["(x, y)"][-1])
+
+                # --- if the condition is not respected while the wall of the artery is not totally considered
+                else:
+                    y_inc = median_min - 256
+                    while(vertical_scanning):
+
+                        if y_inc + 128 > median_max - 128:
+                            vertical_scanning=False
+
+                        self.predictionClass.patches.append(
+                            {"patch": self.extract_patch(x, round(y_inc), image=self.sequence[frameID,]),
+                             "frameID": frameID,
+                             "Step": self.step,
+                             "Overlay": tmpOverlay,
+                             "(x, y)": (x, round(y_inc))})
+
+                        y_inc+=128
+                        y_pos_list.append(self.predictionClass.patches[-1]["(x, y)"][-1])
+
                 self.step += 1
+                vertical_scanning = True
 
-                # ---- if we reach exactly the last position (on the right)
-                if ((x + self.pathWidth) == self.annotationClass.borders['rightBorder']):
+                if ((x + self.patchWidth) == self.annotationClass.bordersROI['rightBorder']):  # if we reach the last position (on the right)
                     condition = False
-                # ---- we move the patch from the left to the right with the defined overlay
-                elif (x + self.overlay + self.pathWidth) < (self.annotationClass.borders['rightBorder']):
+
+                elif (x + self.overlay + self.patchWidth) < (self.annotationClass.bordersROI['rightBorder']):  # we move the patch from the left to the right with an overlay
                     x += self.overlay
                     tmpOverlay = self.overlay
-                # ---- we adjust the last patch to reach the right border
+
                 else:
-                    tmp = x + self.pathWidth - self.annotationClass.borders['rightBorder']
+                    tmp = x + self.patchWidth - self.annotationClass.bordersROI['rightBorder']  # we adjust to reach the right border
                     x -= tmp
                     tmpOverlay = tmp
 
             condition = True
 
-            # ---- we segment the current frame
-            self.predictionClass.PredictionMasks()
+            min_y = min(y_pos_list)
+            max_y = max(y_pos_list)
+            self.predictionClass.prediction_masks(id=frameID, pos={"min": min_y,
+                                                                   "max": max_y+self.patchHeight})
 
-            # ---- we extract the borders
-            self.annotationClass.updateAnnotation(previousMask = self.predictionClass.mapPrediction[self.currentFrame, ],
-                                                  frameID = self.currentFrame + 1)
+            tmpMask = self.predictionClass.mapPrediction[str(frameID)]["prediction"]
+            mask_tmp = self.annotationClass.updateAnnotation(previousMask=tmpMask,
+                                                             frameID=frameID + 1,
+                                                             offset=self.predictionClass.mapPrediction[str(frameID)]["offset"]).copy()
+            mask_tmp_height = mask_tmp.shape[0]
+            # --- for display only
+            self.finalMaskAfterPostProcessing[self.predictionClass.mapPrediction[str(frameID)]["offset"]:self.predictionClass.mapPrediction[str(frameID)]["offset"]+mask_tmp_height,:] = mask_tmp
 
+            # for k in range(self.annotationClass.mapAnnotation[0,:,0].shape[0]):
+            #     self.firstFrame[round(self.annotationClass.mapAnnotation[1,k,0]/self.scale), k] = 255
+            #     self.firstFrame[round(self.annotationClass.mapAnnotation[1, k, 1]/self.scale), k] = 255
+        exec_t = time.time() - t
+        print("execution time: ", exec_t)
 
-    def extractPatch(self, x, y):
+    # ------------------------------------------------------------------------------------------------------------------------------------
 
-        """
-        We extract the patch from the sequence.
+    def initialization_step(self):
+        '''
+        return the left border
+        '''
+        return self.annotationClass.bordersROI['leftBorder']
 
-        ----
-        return: the desired patch
-        """
-        return self.sequence[self.currentFrame, y:(y + self.patchHeight), x:(x + self.pathWidth)]
+    # ------------------------------------------------------------------------------------------------------------------------------------
 
-    def ComputeIMT(self):
-        """
-        In this function we compute to average value of the intima-media thickness in the region self.annotationClass.bordersROI['leftBorder'] and self.annotationClass.bordersROI['rightBorder']
+    def extract_patch(self, x, y, image):
+        '''
+        extracts a patch at a given (x, y) coordinate
+        '''
+        return image[y:(y + self.patchHeight), x:(x + self.patchWidth)]
 
-        ----
+    # ------------------------------------------------------------------------------------------------------------------------------------
 
-        return:  IMTMeanValue, IMTMedianValue
+    def compute_IMT(self, p, patient):
 
-        """
-
+        self.annotationClass.mapAnnotation = self.annotationClass.mapAnnotation[1:,]
         IMTMeanValue, IMTMedianValue = self.annotationClass.IMT()
         # plotting the points
         # convert in micro meter
-        newSpatialResolution = self.spacing /self.scale * 10000 #in micro meter
+        newSpatialResolution = self.spacing /self.scale * 10000 # in micro meter
 
+        plt.rcParams.update({'font.size': 16})
         plt.subplot(211)
-        plt.plot(IMTMeanValue[1:]*newSpatialResolution, "b")
+        plt.plot(IMTMeanValue*newSpatialResolution, "b")
         plt.ylabel('Thickness in $\mu$m')
         plt.legend(['Mean'], loc='lower right')
         plt.subplot(212)
-        plt.plot(IMTMedianValue[1:]*newSpatialResolution, "r")
+        plt.plot(IMTMedianValue*newSpatialResolution, "r")
         plt.ylabel('Thickness in $\mu$m')
         plt.xlabel('Frame ID')
         plt.legend(['Median'], loc='lower right')
-        plt.savefig("logs/IMTThroughtCardiacCycle")
-
-        print("Width (cm): ", self.spacing*(self.annotationClass.bordersROI['rightBorder']-self.annotationClass.bordersROI['leftBorder']))
+        plt.savefig(os.path.join(p.PATH_TO_SAVE_RESULTS_COMPRESSION, patient + '_IMT_compression' + '.png'))
+        plt.close()
 
         return IMTMeanValue, IMTMedianValue
