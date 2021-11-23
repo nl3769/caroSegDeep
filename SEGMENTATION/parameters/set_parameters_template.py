@@ -5,6 +5,7 @@ from shutil import copyfile
 # ****************************************************************
 # *** HOWTO
 # ****************************************************************
+
 # 0) Do not modify this template file "setParameterstemplate.py"
 # 1) Create a new copy of this file "setParametersTemplate.py" and rename it into "setParameters.py"
 # 2) Indicate all the variables according to your local environment and experiment
@@ -17,21 +18,21 @@ def setParameters():
 
   p = Parameters(
 
-                PATH_TO_SEQUENCES='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/IMAGES',                  # Path where the sequences/images are saved (.tiff, .DICOM, .MAT)
-                PATH_TO_BORDERS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/BORDERS',         # Path where the borders are saved (.MAT)
-                PATH_TO_CONTOURS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/CONTOURS',       # Path where the contours are saved (.MAT, .txt)
-                PATH_TO_CF='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/CF',
+                PATH_TO_SEQUENCES='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/IMAGES',                    # Path where the sequences/images are saved (.tiff, .DICOM, .MAT)
+                PATH_TO_BORDERS='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/BORDERS',                     # Path where the borders are saved (.MAT)
+                PATH_TO_CONTOURS='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/CONTOURS',                   # Path where the contours are saved (.MAT, .txt)
+                PATH_TO_CF='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/CF',
                 PROCESS_FULL_SEQUENCE=False,        # Segment all the frame of the sequence or only the first one
                 PATCH_HEIGHT=512,                   # The height of a patch
                 PATCH_WIDTH=128,                    # The width of a patch
                 OVERLAPPING=8,                      # Horizontal displacement of a patch
                 DESIRED_SPATIAL_RESOLUTION=5,       # The desired spatial resolution in um
-                PATH_FAR_WALL_DETECTION_RES='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS',                                                           # Where the detection of the far wall was saved
-                PATH_TO_LOAD_TRAINED_MODEL_FAR_WALL='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/TRAINED_MODEL',                                             # Path where the trained model is saved
-                PATH_WALL_SEGMENTATION_RES='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS',
-                PATH_TO_LOAD_TRAINED_MODEL_WALL='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/TRAINED_MODEL',                                                 # Path where the trained model is saved
-                MANUAL_FAR_WALL_DETECTION=True,                # if True then the home made GUI is used, else the prediction of the far wall are loaded
-                AUTOMATIC_METHOD=False                          # run the fully automatic method
+                PATH_FAR_WALL_DETECTION_RES='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/FAR_WALL',         # Where the detection of the far wall was saved
+                PATH_TO_LOAD_TRAINED_MODEL_FAR_WALL='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/TRAINED_MODEL',    # Path where the trained model is saved
+                PATH_WALL_SEGMENTATION_RES='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/WALL',
+                PATH_TO_LOAD_TRAINED_MODEL_WALL='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/TRAINED_MODEL',        # Path where the trained model is saved
+                MANUAL_FAR_WALL_DETECTION=True,             # if True then the home made GUI is used, else the prediction of the far wall are loaded
+                AUTOMATIC_METHOD=False                      # run the fully automatic method
   )
 
   # --- Print all attributes in the console
