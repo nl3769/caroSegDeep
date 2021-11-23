@@ -139,7 +139,6 @@ def custom_dilated_unet(input_shape,
                         kernel_regularizer = None,
                         dropout = None):
 
-
     inputs = Input(input_shape)
 
     enc, skip, skip_pool_col = encoder(inputs, filters, n_block=n_block, kernel_size=kernel_size, SE = SE, n_pool_col=n_pool_col, kernel_regularizer = kernel_regularizer, dropout = dropout)

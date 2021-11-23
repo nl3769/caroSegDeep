@@ -7,7 +7,6 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import RMSprop
 import numpy as np
 
-
 # --------------------------------------------------------
 def squeeze_excitation(input, r):
     size_conv = input.shape  # 5 features maps (50*50)
@@ -25,8 +24,6 @@ def squeeze_excitation(input, r):
     excitation = tensorflow.reshape(sigmoid, [-1, 1, 1, int(np.shape(input)[-1])])
 
     return input * excitation
-
-
 # --------------------------------------------------------
 def encoder(x, filters=44, n_block=3, kernel_size=(3, 3), activation='relu', n_pool_col = 2, SE = True, kernel_regularizer=None, dropout=None):
     skip = []
@@ -64,8 +61,6 @@ def encoder(x, filters=44, n_block=3, kernel_size=(3, 3), activation='relu', n_p
             x = Dropout(dropout)(x)
 
     return x, skip, skip_pool_col
-
-
 # --------------------------------------------------------
 def bottleneck(x, filters_bottleneck, mode='cascade', depth=6, kernel_size=(3, 3), activation='relu', kernel_regularizer = None, dropout=None):
     dilated_layers = []
@@ -85,8 +80,6 @@ def bottleneck(x, filters_bottleneck, mode='cascade', depth=6, kernel_size=(3, 3
             dilated_layers.append(x)
 
     return add(dilated_layers)
-
-
 # --------------------------------------------------------
 def decoder(x, skip, skip_pool_col, filters, n_block=3, kernel_size=(3, 3), activation='relu', n_pool_col = 2, SE = True, kernel_regularizer = None, dropout=None):
 
@@ -126,8 +119,6 @@ def decoder(x, skip, skip_pool_col, filters, n_block=3, kernel_size=(3, 3), acti
         if dropout > 0:
             x = Dropout(dropout)(x)
     return x
-
-
 # --------------------------------------------------------
 def custom_dilated_unet(input_shape,
                         mode,

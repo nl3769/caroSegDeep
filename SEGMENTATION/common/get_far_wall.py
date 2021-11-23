@@ -113,13 +113,13 @@ class cv2Annotation:
                         xSorted[k] = xP[sort[k]]
                         ySorted[k] = yP[sort[k]]
 
-                    # cubic spline interpolation
+                    # --- cubic spline interpolation
                     tck = interpolate.splrep(xSorted, ySorted, s=0)
                     ynew = interpolate.splev(xnew, tck, der=0)
 
                     self.wallPosition = ynew.copy()
 
-                    # we update the image
+                    # --- we update the image
                     lastChannel = self.chanel.copy()
                     for k in range(ynew.shape[0]):
                         lastChannel[round(ynew[k]), xnew[k]] = 255
@@ -140,11 +140,11 @@ class cv2Annotation:
                     xSorted[k] = xP[sort[k]]
                     ySorted[k] = yP[sort[k]]
 
-                # cubic spline interpolation
+                # --- cubic spline interpolation
                 tck = interpolate.splrep(xSorted, ySorted, s=0)
                 ynew = interpolate.splev(xnew, tck, der=0)
 
-                # we update the image
+                # --- we update the image
                 lastChannel = self.chanel.copy()
                 for k in range(ynew.shape[0]):
                     lastChannel[round(ynew[k]), xnew[k]] = 255

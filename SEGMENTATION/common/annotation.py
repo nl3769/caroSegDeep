@@ -8,8 +8,6 @@ from functions.borders_extraction import *
 from numba import jit
 import numpy as np
 
-
-
 class annotationClass():
 
     def __init__(self,

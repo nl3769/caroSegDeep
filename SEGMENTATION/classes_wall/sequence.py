@@ -31,9 +31,7 @@ class sequenceClass():
         self.currentFrame = 0
 
         self.finalMaskAfterPostProcessing = np.zeros(self.sequence.shape[1:])
-
     # ------------------------------------------------------------------------------------------------------------------------------------
-
     def launch_segmentation_dynamic_vertical_scan(self):
 
         '''
@@ -150,25 +148,19 @@ class sequenceClass():
             #     self.firstFrame[round(self.annotationClass.mapAnnotation[1, k, 1]/self.scale), k] = 255
         exec_t = time.time() - t
         print("execution time: ", exec_t)
-
     # ------------------------------------------------------------------------------------------------------------------------------------
-
     def initialization_step(self):
         '''
         return the left border
         '''
         return self.annotationClass.bordersROI['leftBorder']
-
     # ------------------------------------------------------------------------------------------------------------------------------------
-
     def extract_patch(self, x, y, image):
         '''
         extracts a patch at a given (x, y) coordinate
         '''
         return image[y:(y + self.patchHeight), x:(x + self.patchWidth)]
-
     # ------------------------------------------------------------------------------------------------------------------------------------
-
     def compute_IMT(self, p, patient):
 
         self.annotationClass.mapAnnotation = self.annotationClass.mapAnnotation[1:,]

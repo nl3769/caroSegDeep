@@ -2,9 +2,8 @@ import cv2
 import numpy as np
 
 from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import *
-from caroSegDeepBuildModel.KerasSegmentationFunctions.models import custom_dilated_unet
+from caroSegDeepBuildModel.KerasSegmentationFunctions.models.custom_dilated_unet import custom_dilated_unet
 # from model.custom_dilated_unet import custom_dilated_unet
-import matplotlib.pyplot as plt
 # from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import dice_bce_loss
 
 import os
