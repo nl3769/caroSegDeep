@@ -17,8 +17,6 @@ files_A1_bis = loadData.load_files(path_annotations_A1_bis);
 files_A2 = loadData.load_files(path_annotations_A2);
 files_A3 = loadData.load_files(path_annotations_A3);
 
-annotationNb=size(files_A1);
-
 
 for k=1:size(files_A1, 1)
         names_patient{k}=files_A1(k).name;
