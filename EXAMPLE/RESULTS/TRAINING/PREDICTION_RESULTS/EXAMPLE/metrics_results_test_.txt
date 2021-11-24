@@ -1,5 +1,0 @@
-Loss on test dataset: 1.3954050540924072
-DICE on test dataset: 0.30209678411483765
-DICE (binary image) test dataset: 0.21232747842864183, std: 0.10769748675041373
-Hausdorff distance in mm on test dataset: 1.5839756050818943, std: 0.7450171475845652
-IOU on test dataset: 0.1800825595855713

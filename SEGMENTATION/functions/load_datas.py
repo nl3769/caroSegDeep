@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import cv2
 import os
 
-def LoadData(sequence,
+def load_data(sequence,
             spatialResolution,
             fullSequence,
             p):
@@ -14,109 +14,34 @@ def LoadData(sequence,
     extension = sequence.split('.')
     LOI = False
     if extension[-1] != "mat" and extension[-1] != "tiff":
-        extension0 = 'dicom'
+        extension = 'dicom'
     else:
-        extension0 = extension[-1]
+        extension = extension[-1]
 
     if sequence.split('/')[-1].split('_')[0] == 'LOI':
         LOI =  True
 
 
 
-    if extension0 == 'dicom':
-        return LoadDICOMSequence(sequence=sequence,
+    if extension == 'dicom':
+        return load_DICOM_sequence(sequence=sequence,
                                  spatialResolution=spatialResolution,
                                  fullSequence=fullSequence)
-    if extension0 == 'mat' and LOI == False:
-        return LoadMATSequence(sequence=sequence,
+    if extension == 'mat' and LOI == False:
+        return load_MAT_sequence(sequence=sequence,
                                spatialResolution=spatialResolution,
                                fullSequence=fullSequence)
 
-    if extension0 == 'mat' and LOI == True:
-        return LoadMATImage(sequence=sequence,
+    if extension == 'mat' and LOI == True:
+        return load_MAT_image(sequence=sequence,
                                spatialResolution=spatialResolution)
 
-    if extension0 == 'tiff':
-        return LoadTiffImage(sequence=sequence,
+    if extension == 'tiff':
+        return load_TIFF_image(sequence=sequence,
                              spatialResolution=spatialResolution,
                              CFPath=p.PATH_TO_CF)
-
-def LoadFirstFrameFromDICOM(sequences_path,
-                            name_database,
-                            files_sequences_f,
-                            img_index):
-
-    sq = dcmread(sequences_path + name_database + files_sequences_f[img_index])
-    spatialResolutionY = sq.SequenceOfUltrasoundRegions[0].PhysicalDeltaY
-    spatialResolutionX = sq.SequenceOfUltrasoundRegions[0].PhysicalDeltaX
-    sq = sq.pixel_array
-    dimension = sq.shape  # get the dimension of the sequence
-    img_nb = dimension[0]  # get the number of sequences
-
-    # get the first image of the sequence
-    current_img = sq[0, :, :, :]
-    current_img = np.uint8(rgb2gray(current_img) * 255)
-
-    return current_img, spatialResolutionX, spatialResolutionY
-
-def LoadFirstFrameMat(sequences_path,
-                      name_database,
-                      patientName):
-
-    img_t = scipy.io.loadmat(sequences_path + name_database + patientName)
-    img_t = img_t['ima']
-
-    return img_t
-
-def LoadBorders(path):
-    mat_b = scipy.io.loadmat(path)
-    right_b = mat_b['border_right']
-    right_b = right_b[0, 0]
-    left_b = mat_b['border_left']
-    left_b = left_b[0, 0]
-
-    return left_b-1, right_b-1
-
-def LoadBordersUsingName(borders_path,
-                         name_database,
-                         borders_name):
-
-    mat_b = scipy.io.loadmat(borders_path + name_database + borders_name)
-    right_b = mat_b['border_right']
-    right_b = right_b[0, 0]
-    left_b = mat_b['border_left']
-    left_b = left_b[0, 0]
-
-    return left_b, right_b
-
-def LoadAnnotation(path,
-                   databaseName,
-                   patient,
-                   nameExpert):
-
-
-    dataPathIFC3 = path + databaseName + '/' + patient.split('.')[0] + "_IFC3_" + nameExpert + ".mat"
-    dataPathIFC4 = path + databaseName + '/' + patient.split('.')[0] + "_IFC4_" + nameExpert + ".mat"
-
-    mat_IFC3 = scipy.io.loadmat(dataPathIFC3)
-    mat_IFC3 = mat_IFC3['seg']
-
-    mat_IFC4 = scipy.io.loadmat(dataPathIFC4)
-    mat_IFC4 = mat_IFC4['seg']
-
-    return mat_IFC3, mat_IFC4
-
-def LoadAnnotationUsingName(contours_path,
-                            name_database,
-                            nameAnnotationIFC3,
-                            nameAnnotationIFC4):
-
-    mat_IFC3 = scipy.io.loadmat(contours_path + name_database + nameAnnotationIFC3)
-    mat_IFC4 = scipy.io.loadmat(contours_path + name_database + nameAnnotationIFC4)
-
-    return {"IFC3": mat_IFC3['seg'][0, :], "IFC4": mat_IFC4['seg'][0, :] }
-
-def LoadDICOMSequence(sequence,
+# ----------------------------------------------------------------
+def load_DICOM_sequence(sequence,
                       spatialResolution,
                       fullSequence):
 
@@ -134,7 +59,7 @@ def LoadDICOMSequence(sequence,
         for i in range(dimSq[0]):
             out[i, :, :] = np.float32(rgb2gray(sq[i,]) * 255)
 
-        out, scale = SequencePreProcessing(sequence = out,
+        out, scale = sequence_preprocessing(sequence = out,
                                            currentSpatialResolution = spatialResolutionY,
                                            spatialResolution = spatialResolution)
 
@@ -142,91 +67,71 @@ def LoadDICOMSequence(sequence,
         dimSq = sq.shape
         out = np.zeros((1,) + (dimSq[1],) + (dimSq[2],))
 
-        # get the first image of the sequence
-
+        # --- get the first image of the sequence
         out[0,] = np.float32(rgb2gray(sq[0,]) * 255)
-
-        out, scale = SequencePreProcessing(sequence=out,
+        out, scale = sequence_preprocessing(sequence=out,
                                            currentSpatialResolution=spatialResolutionY,
                                            spatialResolution=spatialResolution)
 
     return out, scale, spatialResolutionY, firstFrame
-
-def LoadMATSequence(sequence,
+# ----------------------------------------------------------------
+def load_MAT_sequence(sequence,
                     spatialResolution,
                     fullSequence):
     data = scipy.io.loadmat(sequence)
     seq = data['ImgTmp']
     seq = np.moveaxis(seq, -1, 0)
-    # spatialResolutionY = data['PhysicalDeltaY'][0][0]
     spatialResolutionY = 0.0034
     firstFrame = seq[0,:,:].copy()
 
     if fullSequence == True:
-        dimSq = seq.shape
-        out = np.zeros(dimSq)
-
-        out, scale = SequencePreProcessing(sequence = seq,
+        out, scale = sequence_preprocessing(sequence = seq,
                                            currentSpatialResolution = spatialResolutionY,
                                            spatialResolution = spatialResolution)
 
     elif fullSequence == False:
-
-        out, scale = SequencePreProcessing(sequence=np.expand_dims(seq[0,], axis=0),
+        out, scale = sequence_preprocessing(sequence=np.expand_dims(seq[0,], axis=0),
                                            currentSpatialResolution=spatialResolutionY,
                                            spatialResolution=spatialResolution)
 
     return out, scale, spatialResolutionY, firstFrame
-
-def LoadMATImage(sequence,
+# ----------------------------------------------------------------
+def load_MAT_image(sequence,
                  spatialResolution):
     data = scipy.io.loadmat(sequence)
     seq = data['ima']
     spatialResolutionY = 0.0067
     firstFrame = seq.copy()
 
-    out, scale = SequencePreProcessing(sequence=np.expand_dims(seq, axis=0),
+    out, scale = sequence_preprocessing(sequence=np.expand_dims(seq, axis=0),
                                        currentSpatialResolution=spatialResolutionY,
                                        spatialResolution=spatialResolution)
 
     return out, scale, spatialResolutionY, firstFrame
-
-def LoadTiffImage(sequence,
-                  spatialResolution,
-                  CFPath):
+# ----------------------------------------------------------------
+def load_TIFF_image(sequence,
+                   spatialResolution,
+                   CFPath):
     seq = plt.imread(sequence)
-
     if len(seq.shape) == 3:
         seq = seq[:,:,0]
-
     pathToSpacing = os.path.join(CFPath, sequence.split('/')[-1].split('.')[0] + "_CF.txt")
-    spatialResolutionY = readCFDirectory(pathToSpacing)
+    spatialResolutionY = read_CF_directory(pathToSpacing)
 
     firstFrame = seq.copy()
 
-    out, scale = SequencePreProcessing(sequence=np.expand_dims(seq, axis=0),
+    out, scale = sequence_preprocessing(sequence=np.expand_dims(seq, axis=0),
                                        currentSpatialResolution=spatialResolutionY,
                                        spatialResolution=spatialResolution)
 
     return out, scale, spatialResolutionY, firstFrame
-
-def LoadTiff(sequence):
-    seq = plt.imread(sequence)
-
-    if len(seq.shape) == 3:
-        seq = seq[:, :, 0]
-
-    pathToSpacing = "../../../data/CF/" + sequence.split('/')[-1].split('.')[0] + "_CF.txt"
-    spatialResolutionY = readCFDirectory(pathToSpacing)
-
-    return spatialResolutionY, seq
-
-def readCFDirectory(path):
+# ----------------------------------------------------------------
+def read_CF_directory(path):
     f = open(path, "r")
     val = f.readline().split(' \n')
     return float(val[0])/10
-
-def SequencePreProcessing(sequence,
+# ----------------------------------------------------------------
+def sequence_preprocessing(sequence,
                           currentSpatialResolution,
                           spatialResolution):
 
@@ -237,9 +142,6 @@ def SequencePreProcessing(sequence,
 
     scale = height_tmp / heightFrame
 
-    # LI = scale * LI
-    # MA = scale * MA
-
     out = np.zeros((dimFrame[0],) + (height_tmp,) + (dimFrame[2],))
 
     for i in range(dimFrame[0]):
@@ -247,10 +149,58 @@ def SequencePreProcessing(sequence,
 
 
     return out.astype(np.float32), scale
+# ----------------------------------------------------------------
+def load_borders(path):
+    mat_b = scipy.io.loadmat(path)
+    right_b = mat_b['border_right']
+    right_b = right_b[0, 0]
+    left_b = mat_b['border_left']
+    left_b = left_b[0, 0]
 
-def LoadSpatialResolution(sequence):
+    return left_b-1, right_b-1
+# ----------------------------------------------------------------
+def load_tiff(sequence,
+             PATH_TO_CF):
+    seq = plt.imread(sequence)
 
-    sq = dcmread(sequence)
-    spatialResolutionY = sq.SequenceOfUltrasoundRegions[0].PhysicalDeltaY
+    if len(seq.shape) == 3:
+        seq = seq[:, :, 0]
 
-    return spatialResolutionY
+    pathToSpacing = os.path.join(PATH_TO_CF, sequence.split('/')[-1].split('.')[0] + "_CF.txt")
+    spatialResolutionY = read_CF_file(pathToSpacing)
+
+    return spatialResolutionY, seq
+# ----------------------------------------------------------------
+def read_CF_file(path):
+    f = open(path, "r")
+    val = f.readline().split(' \n')
+    return float(val[0])/10
+# ----------------------------------------------------------------
+def load_annotation(path,
+                   patient,
+                   nameExpert):
+
+
+    dataPathIFC3 = path + '/' + patient.split('.')[0] + "_IFC3_" + nameExpert + ".mat"
+    dataPathIFC4 = path + '/' + patient.split('.')[0] + "_IFC4_" + nameExpert + ".mat"
+
+    mat_IFC3 = scipy.io.loadmat(dataPathIFC3)
+    mat_IFC3 = mat_IFC3['seg']
+
+    mat_IFC4 = scipy.io.loadmat(dataPathIFC4)
+    mat_IFC4 = mat_IFC4['seg']
+
+    return mat_IFC3, mat_IFC4
+# ----------------------------------------------------------------
+def get_files(path):
+    """
+    :param path: path of the analyzed folder
+    :return files: a list
+    This function allows to get all the files in a folder. It returns a list containing the name of all the files.
+    """
+    file = []
+    with os.scandir(path) as entries:
+        for entry in entries:
+            if entry.is_file():
+                file.append(entry.name)
+    return file

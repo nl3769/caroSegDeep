@@ -4,7 +4,7 @@ import os
 import argparse
 import importlib
 
-from classes_wall.sequence import sequenceClass
+from classes.sequence import sequenceClass
 
 
 def save_seg(p, seq, patient):
