@@ -12,9 +12,13 @@ if __name__ == '__main__':
     arg = vars(my_parser.parse_args())
     param = importlib.import_module('parameters.' + arg['Parameters'].split('.')[0])
 
+    # --- we get parameters
     p = param.setParameters()
-
+    # --- we run the training
     train(p)
+    # --- we run the metrics on test set
     test(p, dataset='test')
+    # --- we run the metrics on train set
     test(p, dataset='train')
+    # --- we run the metrics on validation set
     test(p, dataset='validation')

@@ -1,6 +1,9 @@
 import os
+import _io
 
-def split_data_fold(data, patientList, file, p):
+def split_data_fold(data: dict, file: _io.TextIOWrapper, p):
+
+    ''' Create training/validation/testing set according to .txt files. '''
 
     dataset = {"train":      {"masks": {}, "images": {}, "patient_name": [], 'spatial_resolution': {}},
                "validation": {"masks": {}, "images": {}, "patient_name": [], 'spatial_resolution': {}},
@@ -29,15 +32,15 @@ def split_data_fold(data, patientList, file, p):
 
             if name in data.keys():
 
-                tmpmasks = data[name]["patch_mask"]
-                tmpimages = data[name]["patch_Image_org"]
-                tmpspatialResolution = data[name]["spatial_resolution"]
+                masks_ = data[name]["patch_mask"]
+                images_ = data[name]["patch_Image_org"]
+                spatial_res_ = data[name]["spatial_resolution"]
 
                 dataset[key]["patient_name"].append(name)
-                for img in tmpmasks.keys():
-                    dataset[key]["masks"][img] = tmpmasks[img]
-                    dataset[key]["images"][img] = tmpimages[img]
-                    dataset[key]["spatial_resolution"][img] = tmpspatialResolution[img]
+                for img in masks_.keys():
+                    dataset[key]["masks"][img] = masks_[img]
+                    dataset[key]["images"][img] = images_[img]
+                    dataset[key]["spatial_resolution"][img] = spatial_res_[img]
 
                 del data[name]
             else:

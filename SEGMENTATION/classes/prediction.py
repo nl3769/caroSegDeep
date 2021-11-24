@@ -8,76 +8,60 @@ from caroSegDeepBuildModel.KerasSegmentationFunctions.models.custom_dilated_unet
 
 class predictionClass():
 
-    def __init__(self, dimensions, patchHeight, patchWidth, borders, p, flatten=False, img=None):
+    def __init__(self, dimensions: tuple, patch_height: int, patch_width: int, borders: dict, p, img=None):
 
-        self.patchHeight = patchHeight                  # height of the patch
-        self.dim = dimensions                           # dimension of the interpolated image
-        self.patchWidth = patchWidth                    # width of the patch
-        self.patches = []                               # list in which extracted patches are stored
-        self.predictedMasks = []                        # array in which we store the prediction
-        self.finalMaskOrg = []                             # array in which we store the final combinaison of all prediction
-        self.flatten = flatten                          # use if we flatten the ROI
-        self.borders = borders                          # left and righ borders
-        self.mapOverlay, self.mapPrediction = {}, {}    # dictionaries that evolve during the inference phase
+        ''' The prediction class contains the trained architecture and performs the following calculations:
+            - prediction of masks
+            - compute overlay and prediction maps '''
+
+        self.patch_height = patch_height                    # height of the patch
+        self.dim = dimensions                               # dimension of the interpolated image
+        self.patch_width = patch_width                      # width of the patch
+        self.patches = []                                   # list in which extracted patches are stored
+        self.predicted_masks = []                           # array in which we store the prediction
+        self.final_mask_org = []                            # array in which we store the final combinaison of all prediction
+        self.borders = borders                              # left and right borders
+        self.map_overlay, self.map_prediction = {}, {}      # dictionaries evolve during the inference phase
         self.img = img
 
         self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, 'wall.h5'))
-
-    def prediction_masks(self, id, pos):
-
-        """
-        We first retrieve the pacthes. Then the preprocessing is applied and the self.build_maps method reassembles them
-        """
-
+    # ------------------------------------------------------------------------------------------------------------------
+    def prediction_masks(self, id: int, pos: dict):
+        """ Retrieves pacthes, then preprocessing is applied and the self.build_maps method reassembles them. """
         patchImg = []
-
         for i in range(len(self.patches)):
             patchImg.append(self.patches[i]["patch"])
-
         patches = np.asarray(patchImg)
         patches = self.patch_preprocessing(patches=patches)
         patches = patches[:,:][...,None]
-
+        # --- prediction
         masks = self.model.predict(patches, batch_size=1, verbose=1)
-        self.predictedMasks = masks.copy()
-
-        if self.flatten == False:
-            self.build_maps(prediction=masks, id=id, pos=pos)
-        else:
-            self.build_mapsFlatten(prediction=masks, id=id, pos=pos)
-
-
-    def build_maps(self,
-                  prediction,
-                  id,
-                  pos):
-        '''
-        Assembling the patches and predictions to create the overlay map and the prediction map
-        '''
-        tmpPred, tmpOverlay = np.zeros((pos['max'] - pos['min'], self.dim[2])), np.zeros((pos['max'] - pos['min'], self.dim[2]))
-
+        self.predicted_masks = masks.copy()
+        # --- reassemble patches
+        self.build_maps(prediction=masks, id=id, pos=pos)
+    # ------------------------------------------------------------------------------------------------------------------
+    def build_maps(self, prediction: np.ndarray, id: int, pos: dict):
+        ''' Assembles the patches and predictions to create the overlay map and the prediction map. '''
+        pred_, overlay_ = np.zeros((pos['max'] - pos['min'], self.dim[2])), np.zeros((pos['max'] - pos['min'], self.dim[2]))
         for i in range(len(self.patches)):
-            tmpData = self.patches[i]
-            tmpPos = tmpData["(x, y)"]
+            patch_ = self.patches[i]
+            pos_ = patch_["(x, y)"]
+            pred_[pos_[1]-pos['min']:(pos_[1]-pos['min']+self.patch_height), pos_[0]:pos_[0] + self.patch_width] = pred_[pos_[1]-pos['min']:pos_[1]-pos['min'] + self.patch_height, pos_[0]:pos_[0] + self.patch_width] + prediction[i,:,:,0]
+            overlay_[pos_[1]-pos['min']:pos_[1]-pos['min'] + self.patch_height, pos_[0]:pos_[0] + self.patch_width] = overlay_[pos_[1]-pos['min']:pos_[1]-pos['min'] + self.patch_height, pos_[0]: pos_[0] + self.patch_width] + np.ones((self.patch_height, self.patch_width))
 
-            tmpPred[tmpPos[1]-pos['min']:(tmpPos[1]-pos['min']+self.patchHeight), tmpPos[0]:tmpPos[0] + self.patchWidth] = tmpPred[tmpPos[1]-pos['min']:tmpPos[1]-pos['min'] + self.patchHeight, tmpPos[0]:tmpPos[0] + self.patchWidth] + prediction[i,:,:,0]
-            tmpOverlay[tmpPos[1]-pos['min']:tmpPos[1]-pos['min'] + self.patchHeight, tmpPos[0]:tmpPos[0] + self.patchWidth] = tmpOverlay[tmpPos[1]-pos['min']:tmpPos[1]-pos['min'] + self.patchHeight, tmpPos[0]: tmpPos[0] + self.patchWidth] + np.ones((self.patchHeight, self.patchWidth))
+        overlay_[overlay_ == 0] = 1
+        pred_ = pred_/overlay_
 
-        tmpOverlay[tmpOverlay == 0] = 1
-        tmpPred = tmpPred/tmpOverlay
-
-        self.mapOverlay[str(id)] = {"prediction": tmpOverlay.copy(), "offset": pos['min']}
-        self.mapPrediction[str(id)] = {"prediction": tmpPred.copy(), "offset": pos['min']}
+        self.map_overlay[str(id)] = {"prediction": overlay_.copy(), "offset": pos['min']}
+        self.map_prediction[str(id)] = {"prediction": pred_.copy(), "offset": pos['min']}
 
         # --- for display only
-        self.finalMaskOrg = np.zeros(self.dim[1:])
-        mask_tmp_height = tmpPred.shape[0]
-        self.finalMaskOrg[pos['min']:(pos['min'] + mask_tmp_height),:] = tmpPred
-
-    def load_model(self, modelName):
-        '''
-        Load the trained architecture
-        '''
+        self.final_mask_org = np.zeros(self.dim[1:])
+        mask_tmp_height = pred_.shape[0]
+        self.final_mask_org[pos['min']:(pos['min'] + mask_tmp_height),:] = pred_
+    # ------------------------------------------------------------------------------------------------------------------
+    def load_model(self, model_name: str):
+        ''' Loads the trained architecture. '''
         model = custom_dilated_unet(input_shape=(512, 128, 1),
                                     mode='cascade',
                                     filters=32,
@@ -90,14 +74,11 @@ class predictionClass():
                                     kernel_regularizer=None,
                                     dropout=0.2)
 
-        model.load_weights(modelName)
+        model.load_weights(model_name)
         return model
-
-    def patch_preprocessing(self, patches):
-        '''
-        patch preprocessing
-        '''
-
+    # ------------------------------------------------------------------------------------------------------------------
+    def patch_preprocessing(self, patches: np.ndarray):
+        ''' Patch preprocessing -> linear histogram between 0 and 255. '''
         for k in range(patches.shape[0]):
             tmp = patches[k,]
             min = tmp.min()
@@ -107,5 +88,4 @@ class predictionClass():
                 max = 0.1
             tmp = tmp*255/max
             patches[k,] = tmp
-
         return patches

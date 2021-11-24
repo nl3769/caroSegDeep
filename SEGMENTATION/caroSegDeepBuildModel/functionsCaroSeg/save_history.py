@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import os
-def SaveLoss(history, pathToSave, ModelName):
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
+
+def save_loss(loss_train: list, loss_val: list, pathToSave: str, ModelName: str):
+    ''' Saves the evolution of loss during training. '''
+    plt.plot(loss_train)
+    plt.plot(loss_val)
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
@@ -10,9 +12,10 @@ def SaveLoss(history, pathToSave, ModelName):
     plt.savefig(os.path.join(pathToSave, ModelName + '_loss.png'))
     plt.close()
 
-def SaveIOU(history, pathToSave, ModelName):
-    plt.plot(history.history['iou'])
-    plt.plot(history.history['val_iou'])
+def save_IOU(IOU_train: list, IOU_val: list, pathToSave: str, ModelName: str):
+    ''' Saves the evolution of IOU during training. '''
+    plt.plot(IOU_train)
+    plt.plot(IOU_val)
     plt.title('model IOU')
     plt.ylabel('IOU')
     plt.xlabel('epoch')
@@ -20,9 +23,10 @@ def SaveIOU(history, pathToSave, ModelName):
     plt.savefig(os.path.join(pathToSave, ModelName + '_IOU.png'))
     plt.close()
 
-def SaveDICE(history, pathToSave, ModelName):
-    plt.plot(history.history['dice_coef'])
-    plt.plot(history.history['val_dice_coef'])
+def save_DICE(DICE_train: list, DICE_val: list, pathToSave: str, ModelName: str):
+    ''' Saves the evolution of DICE during training. '''
+    plt.plot(DICE_train)
+    plt.plot(DICE_val)
     plt.title('model DICE')
     plt.ylabel('DICE')
     plt.xlabel('epoch')

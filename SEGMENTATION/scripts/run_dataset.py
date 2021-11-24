@@ -10,7 +10,9 @@ if __name__ == "__main__":
     arg = vars(my_parser.parse_args())
     param = importlib.import_module('parameters.' + arg['Parameters'].split('.')[0])
 
+    # --- we get parameters
     p = param.setParameters()
-
+    # --- we create datasetBuilder object
     dataSet = datasetBuilder(p=p)
+    # --- we create the dataset
     dataSet.build_data()

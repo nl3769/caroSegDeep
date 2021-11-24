@@ -31,7 +31,7 @@ def setParameters():
     PATH_TO_SEQUENCES='/home/nlaine/cluster/PROJECTS_IO/DATA/MEIBURGER/images',  # Path where the sequences/images are saved (.tiff, .DICOM, .MAT)
     PATH_TO_BORDERS='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/BORDERS/BORDERS_A1',                         # Path where the borders are saved (.mat)
     PATH_TO_CONTOUR='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/CONTOURS/A1',                                # Path where the contours are saved (.mat, .txt)
-    PATH_TO_CF='/mnt/166CCE046CCDDE9D/CUBS/CF',                             # Patch where the calibration factor is saved
+    PATH_TO_CF='/home/nlaine/cluster/PROJECTS_IO/DATA/MEIBURGER/CF',                             # Patch where the calibration factor is saved
     EXPERT='A1',                                                            # Name of the expert
     DATABASE_NAME = ['CUBS'],                                               # Name of the database
     PATH_TO_SAVE_DATASET='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/DATASET',             # path to save the dataset in h5 format

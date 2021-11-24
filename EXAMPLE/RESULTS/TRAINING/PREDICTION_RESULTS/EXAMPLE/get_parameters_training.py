@@ -24,7 +24,7 @@ def create_directory(path):
   for f in os.listdir(path):
     os.remove(os.path.join(path, f))
 
-def setParameters():
+def getParameters():
 
   p = Parameters(
     # --- relative to the training phase
@@ -60,7 +60,7 @@ def setParameters():
   # --- Modify the function name from "setParameters" to "getParameters"
   fid = open(os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT, 'get_parameters_training.py'), 'rt')
   data = fid.read()
-  data = data.replace('setParameters()', 'getParameters()')
+  data = data.replace('getParameters()', 'getParameters()')
   fid.close()
   fid = open(os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT, 'get_parameters_training.py'),
              'wt')

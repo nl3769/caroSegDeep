@@ -6,14 +6,14 @@ from scipy import interpolate
 
 class cv2Annotation:
 
-    def __init__(self, windowName, image):
+    def __init__(self, windowName: str, image: np.ndarray):
 
         self.windowName = windowName
         self.backup = image.copy()
         self.img1 = image.copy()
         self.img = self.img1.copy()
         self.ROI = []
-        self.chanel = image[:, :, 0].copy()
+        self.channel = image[:, :, 0].copy()
 
         self.dim = image.shape
 
@@ -39,7 +39,7 @@ class cv2Annotation:
 
         self.stop = False
 
-    def selectPoints(self, event, x, y, flags, param):
+    def select_points(self, event, x: int, y: int, flags: int, param):
 
         if flags == cv2.EVENT_FLAG_CTRLKEY + cv2.EVENT_FLAG_LBUTTON:
             self.stop = True
@@ -49,7 +49,7 @@ class cv2Annotation:
             self.restart = True
             self.img = self.backup.copy()
             self.img1 = self.backup.copy()
-            self.chanel = self.backup[:, :, 0].copy()
+            self.channel = self.backup[:, :, 0].copy()
             self.point = []
             self.curr_pt = []
 
@@ -120,7 +120,7 @@ class cv2Annotation:
                     self.wallPosition = ynew.copy()
 
                     # --- we update the image
-                    lastChannel = self.chanel.copy()
+                    lastChannel = self.channel.copy()
                     for k in range(ynew.shape[0]):
                         lastChannel[round(ynew[k]), xnew[k]] = 255
 
@@ -145,7 +145,7 @@ class cv2Annotation:
                 ynew = interpolate.splev(xnew, tck, der=0)
 
                 # --- we update the image
-                lastChannel = self.chanel.copy()
+                lastChannel = self.channel.copy()
                 for k in range(ynew.shape[0]):
                     lastChannel[round(ynew[k]), xnew[k]] = 255
 
@@ -168,7 +168,7 @@ class cv2Annotation:
 
         cv2.namedWindow(self.windowName, cv2.WINDOW_NORMAL)
         cv2.imshow(self.windowName, self.img)
-        cv2.setMouseCallback(self.windowName, self.selectPoints)
+        cv2.setMouseCallback(self.windowName, self.select_points)
         self.point = []
 
         while (1):
