@@ -13,11 +13,11 @@ from caroSegDeepBuildModel.KerasSegmentationFunctions.models.custom_dilated_unet
 
 class predictionClass():
 
+    ''' The prediction class contains the trained architecture and performs the following calculations:
+    - prediction of masks
+    - compute overlay and prediction maps '''
+    
     def __init__(self, dimensions: tuple, patch_height: int, patch_width: int, borders: dict, p, img=None):
-
-        ''' The prediction class contains the trained architecture and performs the following calculations:
-            - prediction of masks
-            - compute overlay and prediction maps '''
 
         self.patch_height = patch_height                    # height of the patch
         self.dim = dimensions                               # dimension of the interpolated image
