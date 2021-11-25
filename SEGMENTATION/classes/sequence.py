@@ -1,3 +1,8 @@
+'''
+@Author  :   <Nolann Lainé>
+@Contact :   <nolann.laine@outlook.fr>
+'''
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt

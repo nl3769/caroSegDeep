@@ -1,3 +1,8 @@
+'''
+@Author  :   <Nolann Lainé>
+@Contact :   <nolann.laine@outlook.fr>
+'''
+
 from parameters.parameters_inference import Parameters
 import os
 from shutil import copyfile

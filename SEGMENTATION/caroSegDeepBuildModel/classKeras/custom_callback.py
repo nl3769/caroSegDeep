@@ -1,3 +1,8 @@
+'''
+@Author  :   <Nolann Lainé>
+@Contact :   <nolann.laine@outlook.fr>
+'''
+
 import tensorflow.keras
 import tensorflow.keras.backend as K
 import numpy as np

@@ -1,3 +1,8 @@
+'''
+@Author  :   <Nolann Lainé>
+@Contact :   <nolann.laine@outlook.fr>
+'''
+
 import os
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
@@ -9,10 +14,6 @@ import h5py
 
 
 import datetime
-
-import cv2
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 from caroSegDeepBuildModel.KerasSegmentationFunctions.metrics import iou, iou_thresholded, dice_coef

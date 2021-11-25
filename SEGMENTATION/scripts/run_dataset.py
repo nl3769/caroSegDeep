@@ -1,3 +1,8 @@
+'''
+@Author  :   <Nolann Lainé>
+@Contact :   <nolann.laine@outlook.fr>
+'''
+
 from classes.datasetBuilderCUBS import datasetBuilder
 import argparse
 import importlib

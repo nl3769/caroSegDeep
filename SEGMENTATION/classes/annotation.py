@@ -1,3 +1,8 @@
+'''
+@Author  :   <Nolann Lainé>
+@Contact :   <nolann.laine@outlook.fr>
+'''
+
 from classes.cv2Annotation import cv2Annotation
 from functions.get_biggest_connexe_region import get_biggest_connexe_region
 from numba import jit

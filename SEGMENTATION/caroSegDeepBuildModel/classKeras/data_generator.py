@@ -1,7 +1,11 @@
+'''
+@Author  :   <Nolann Lainé>
+@Contact :   <nolann.laine@outlook.fr>
+'''
+
 import numpy as np
 import imgaug.augmenters as iaa
 import random
-import matplotlib.pyplot as plt
 import tensorflow.keras
 
 class DataGenerator1Channel(tensorflow.keras.utils.Sequence):

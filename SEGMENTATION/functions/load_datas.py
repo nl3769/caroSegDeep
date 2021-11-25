@@ -1,3 +1,8 @@
+'''
+@Author  :   <Nolann Lainé>
+@Contact :   <nolann.laine@outlook.fr>
+'''
+
 import numpy as np
 from skimage.color import rgb2gray
 from pydicom import dcmread

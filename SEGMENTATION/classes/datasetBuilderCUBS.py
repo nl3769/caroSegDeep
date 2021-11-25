@@ -1,3 +1,8 @@
+'''
+@Author  :   <Nolann Lainé>
+@Contact :   <nolann.laine@outlook.fr>
+'''
+
 import h5py
 
 from tqdm import tqdm
@@ -6,7 +11,6 @@ import numpy as np
 from functions.load_datas import load_borders, load_tiff, load_annotation, get_files
 from functions.patch_extraction import patch_extraction
 from functions.split_data import split_data_fold
-
 
 class datasetBuilder():
     def __init__(self, p):

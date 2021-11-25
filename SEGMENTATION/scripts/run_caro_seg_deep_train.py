@@ -1,3 +1,8 @@
+'''
+@Author  :   <Nolann Lainé>
+@Contact :   <nolann.laine@outlook.fr>
+'''
+
 from caroSegDeepBuildModel.scriptsCaroSeg.train import train
 from caroSegDeepBuildModel.scriptsCaroSeg.test import test
 import argparse
