@@ -17,22 +17,9 @@
 *.tiff
 clin_*
 
-set_parameters.py
-set_parameters_dynamic_programming.py
-set_parameters_manual_annotation.py
+get_parameters*
 
-set_parameters_NL_*
 
-run_caro_seg_deep_NL*
-run_generate_data_set_NL*
-run_far_wall_detection_NL*
-run_wall_detection_NL*
-run_sorting_data_uniform_manner_NL*
-run_generate_dataset_uniform_NL*
-run_build_data_set_NL*
-run_wall_detection_NL*
-run_eval_intersection_NL*
-run_eval_union_NL*
 
 core.*
 
