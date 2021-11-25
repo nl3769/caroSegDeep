@@ -1,5 +1,6 @@
 function[] = save_borders(path, borders_intersection, borders_union, border_A1, border_A1_bis, border_A2, name)
-
+    % Saves the borders .mat file
+    
     % --- we save the borders (intersection)
     pathToSaveBorders=strcat(path, 'BORDERS/BORDERS_INTERSECTION/', name, '_borders.mat');
     border_right=borders_intersection.border_right;
