@@ -1,9 +1,8 @@
 close all; 
 clear all;
 
+% --- we get parameters
 run('set_parameters')
-% load('parameters.mat')
-
  
 path_annotations_A1 = p.PATH_TO_ANNOTATION_A1 ;
 path_annotations_A1_bis = p.PATH_TO_ANNOTATION_A1_BIS ;
