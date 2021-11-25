@@ -1444,7 +1444,6 @@ clin_0554_L.tiff
 clin_0554_R.tiff
 clin_0217_L.tiff
 clin_0217_R.tiff
-tech_067.tiff
 clin_0071_L.tiff
 clin_0071_R.tiff
 clin_0924_L.tiff
@@ -2130,6 +2129,7 @@ clin_0911_L.tiff
 clin_0911_R.tiff
 clin_0002_L.tiff
 clin_0002_R.tiff
+clin_0768_L.tiff
 clin_0768_R.tiff
 clin_0856_L.tiff
 clin_0856_R.tiff

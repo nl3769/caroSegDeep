@@ -8,7 +8,6 @@ from caroSegDeepBuildModel.scriptsCaroSeg.test import test
 import argparse
 import importlib
 
-
 if __name__ == '__main__':
 
     # -- using a parser with set_parameters.py allows us to run several process with different set_parameters.py with the cluster

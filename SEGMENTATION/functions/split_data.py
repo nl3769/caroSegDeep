@@ -16,7 +16,10 @@ def split_data_fold(data: dict, file: _io.TextIOWrapper, p):
 
     sets = os.listdir(p.PATH_TO_FOLDS)
 
+    var=0
+
     for set in sets:
+        print(f"set: {set}")
         # --- we first read the .txt file which contains the sets
         with open(os.path.join(p.PATH_TO_FOLDS, set)) as f:
             patients = f.readlines()
@@ -34,7 +37,8 @@ def split_data_fold(data: dict, file: _io.TextIOWrapper, p):
 
         for name in patients:
             name = name + ".tiff"
-
+            var = var+1
+            print(f"var {var}")
             if name in data.keys():
 
                 masks_ = data[name]["patch_mask"]
