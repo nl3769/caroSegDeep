@@ -3,7 +3,6 @@
 @Contact :   <nolann.laine@outlook.fr>
 '''
 
-import cv2
 import numpy as np
 from scipy import ndimage
 from skimage.measure import label

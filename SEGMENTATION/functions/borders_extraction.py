@@ -5,9 +5,6 @@
 
 import numpy as np
 import math
-import  matplotlib.pyplot as plt
-# from functions.backPropagation import computeGradientDescent1D
-from PIL import Image
 
 def frontPropagation(costMap, scale=15):
 

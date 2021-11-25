@@ -1,0 +1,4 @@
+Patient name: clin_1007_L.tiff, width window: 53
+Patient name: tech_087.tiff, width window: 114
+Patient name: clin_0406_R.tiff, width window: 119
+Patient name: tech_052.tiff, width window: 126
