@@ -6,7 +6,3 @@ p.PATH_TO_ANNOTATION_A3='/home/nlaine/cluster/PROJECTS_IO/DATA/MEIBURGER/LIMA-Pr
 p.PATH_TO_IMAGES='/home/nlaine/cluster/PROJECTS_IO/DATA/MEIBURGER/images/' ;
 % --------------------------------------------------------------------------------------------v
 p.PATH_RES='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/' ;
-% --------------------------------------------------------------------------------------------v
-% 	save('parameters.mat', 'p');
-	
-
