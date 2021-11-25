@@ -17,4 +17,3 @@ function[] = save_references(LI, MA, path, name, expert, image)
     save(pathToSaveSegMA, 'seg');
 
 end
-
