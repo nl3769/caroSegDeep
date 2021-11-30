@@ -21,8 +21,8 @@ if __name__ == '__main__':
     # --- we run the training
     train(p)
     # --- we run the metrics on test set
-    test(p, dataset='test')
+    test(p, set='test')
     # --- we run the metrics on train set
-    test(p, dataset='train')
+    test(p, set='train')
     # --- we run the metrics on validation set
-    test(p, dataset='validation')
+    test(p, set='validation')

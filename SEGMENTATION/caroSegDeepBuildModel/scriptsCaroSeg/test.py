@@ -14,7 +14,7 @@ from medpy.metric.binary import dc, hd
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import dice_bce_loss, binary_cross_entropy, dice_loss, dice_bce_constraint_MAE, dice_bce_constraint_thickness
+from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import binary_cross_entropy, dice_bce_constraint_MAE, dice_bce_constraint_thickness
 from caroSegDeepBuildModel.KerasSegmentationFunctions.utils import plot_org_gt_pred
 from caroSegDeepBuildModel.KerasSegmentationFunctions.metrics import iou, dice_coef
 from caroSegDeepBuildModel.functionsCaroSeg.model_selection import *

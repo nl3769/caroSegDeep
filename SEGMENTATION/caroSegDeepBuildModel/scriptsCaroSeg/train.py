@@ -17,7 +17,7 @@ import datetime
 
 
 from caroSegDeepBuildModel.KerasSegmentationFunctions.metrics import iou, iou_thresholded, dice_coef
-from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import dice_bce_loss, binary_cross_entropy, dice_loss, dice_bce_constraint_MAE, dice_bce_constraint_thickness
+from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import binary_cross_entropy, dice_bce_constraint_MAE, dice_bce_constraint_thickness
 
 from caroSegDeepBuildModel.functionsCaroSeg.save_history import save_IOU, save_loss, save_DICE
 
