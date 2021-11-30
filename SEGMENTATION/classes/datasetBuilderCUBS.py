@@ -14,7 +14,7 @@ from functions.split_data import split_data_fold
 
 class datasetBuilder():
     def __init__(self, p):
-        ''' class to compute dataset according to CUBS database '''
+        ''' Computes dataset according to CUBS database. '''
         self.window = p.PATCH_WIDTH
         self.overlay = p.PATCH_OVERLAY
         self.scale = p.SCALE
@@ -23,7 +23,7 @@ class datasetBuilder():
         self.p = p
     # ------------------------------------------------------------------------------------------------------------------
     def build_data(self):
-        ''' build_data compute and write the dataset in .h5 file. The h5 contains training, validation and validation set. '''
+        ''' build_data computes and write the dataset in .h5 file. The h5 contains training, validation and validation set. '''
         skipped_sequences=open(os.path.join(self.p.PATH_TO_SKIPPED_SEQUENCES, "skipped_sequences.txt"), "w") # contains images that cannot be incorporated into the data set
         # --- loop is required if more than one database is used. It not necessary for CUBS
         for data_base in self.p.DATABASE_NAME:

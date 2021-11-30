@@ -38,8 +38,3 @@ def dice_coef_thresholded(y_true, y_pred, threshold=0.5, smooth=1.):
     y_pred_f = K.flatten(y_pred)
     intersection = K.sum(y_true_f * y_pred_f)
     return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
-
-# def hausdorff_distance(y_true, y_pred):
-#     y_true = K.flatten(y_true)
-#     y_pred = K.flatten(y_pred)
-#     d2_matrix = pairwise_dis

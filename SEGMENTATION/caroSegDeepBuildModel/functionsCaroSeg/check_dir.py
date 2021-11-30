@@ -1,6 +1,6 @@
 import os
 
-def chekDir(path):
+def chekDir(path: str):
 
     try:
         os.rmdir(path)

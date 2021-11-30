@@ -1,15 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def displayImagesList(seqI, seqM, firstFrameNb, lastFrameNb):
-    '''
-    This function displays k = lastFrameNb - firstFrameNb images of a np.array which has a shape of (x,y,z,1).
-    :param seqI: Images
-    :param seqM: Masks
-    :param firstFrameNb: first frame we want to display
-    :param lastFrameNb: last frame we want to display
-    :return: nothing but display k images
-    '''
+def displayImagesList(seqI: np.ndarray, seqM: np.ndarray, firstFrameNb: int, lastFrameNb: int):
+    ''' This function displays k = lastFrameNb - firstFrameNb images of a np.array which has a shape of (x,y,z,1).
+        :param seqI: Images
+        :param seqM: Masks
+        :param firstFrameNb: first frame we want to display
+        :param lastFrameNb: last frame we want to display. '''
     images = seqI[firstFrameNb:lastFrameNb, :, :, :]
     masks = seqM[firstFrameNb:lastFrameNb, :, :, :]
     dim = images.shape
@@ -23,15 +20,12 @@ def displayImagesList(seqI, seqM, firstFrameNb, lastFrameNb):
 
     plt.show()
 
-def displayImagesTwoChannels(seqI, seqM, firstFrameNb, lastFrameNb):
-    '''
-    This function displays k = lastFrameNb - firstFrameNb images of a np.array which has a shape of (x,y,z,1).
-    :param seqI: Images
-    :param seqM: Masks
-    :param firstFrameNb: first frame we want to display
-    :param lastFrameNb: last frame we want to display
-    :return: nothing but display k images
-    '''
+def displayImagesTwoChannels(seqI: np.ndarray, seqM: np.ndarray, firstFrameNb: int, lastFrameNb: int):
+    ''' This function displays k = lastFrameNb - firstFrameNb images of a np.array which has a shape of (x,y,z,1).
+        :param seqI: Images
+        :param seqM: Masks
+        :param firstFrameNb: first frame we want to display
+        :param lastFrameNb: last frame we want to display '''
     images = seqI[firstFrameNb:lastFrameNb, :, :, 0]
     masks = seqM[firstFrameNb:lastFrameNb, :, :, :]
     dim = images.shape
