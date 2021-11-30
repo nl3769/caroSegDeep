@@ -1,8 +1,5 @@
 import tensorflow
-from tensorflow.keras.losses import binary_crossentropy
 from tensorflow.keras import backend as K
-from tensorflow.keras.layers import ReLU
-import numpy as np
 
 def dice_bce_loss(y_true, y_pred, smooth=1):
     ''' Computes binary cross entropy + Dice loss. '''
