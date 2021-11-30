@@ -30,7 +30,7 @@ class datasetBuilder():
             files_cubs = get_files(self.p.PATH_TO_SEQUENCES) # name of all images in self.p.PATH_TO_SEQUENCES
             # --- loop over all the images in the database
             # for img_index in tqdm(range(len(files_cubs)), ascii=True, desc='Patch (Mask + image): ' + data_base):
-            for img_index in tqdm(range(len(files_cubs[0:100])), ascii=True, desc='Patch (Mask + image): ' + data_base):
+            for img_index in tqdm(range(len(files_cubs)), ascii=True, desc='Patch (Mask + image): ' + data_base):
                 # --- load the image and the calibration factor
                 spatial_res_y, img_f = load_tiff(os.path.join(self.p.PATH_TO_SEQUENCES, files_cubs[img_index]), PATH_TO_CF=self.p.PATH_TO_CF)
                 spatial_resolution_x = spatial_res_y
