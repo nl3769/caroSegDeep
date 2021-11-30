@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
-def plot_org_gt_pred(org,
-                     gt,
-                     pred,
+def plot_org_gt_pred(org: np.ndarray,
+                     gt: np.ndarray,
+                     pred: np.ndarray,
                      NbImgToPlot = 1,
                      figSize = 4,
                      OutputPDF = None):
@@ -24,7 +25,7 @@ def plot_org_gt_pred(org,
     plt.show()
 
 
-def get_cmap(arr):
+def get_cmap(arr: np.ndarray):
     if arr.ndim == 3:
         return 'gray'
     elif arr.ndim == 4:

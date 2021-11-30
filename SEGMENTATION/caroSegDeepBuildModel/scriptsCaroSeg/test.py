@@ -23,9 +23,7 @@ from caroSegDeepBuildModel.classKeras.data_generator import DataGenerator1Channe
 # ----------------------------------------------------------------
 def test(p, set):
 
-    '''
-    Infer the model on testing data and compute the DICE and the Hausdorff distance.
-    '''
+    ''' Infer the model on testing data and compute the DICE and the Hausdorff distance. '''
 
     # --- get set
     data = h5py.File(os.path.join(p.PATH_TO_DATASET), 'r')

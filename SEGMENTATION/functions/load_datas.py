@@ -15,7 +15,7 @@ def load_data(sequence: str,
               spatial_res: int,
               full_seq: bool,
               p):
-
+    ''' Loads any type of date (mat, dicom, tiff) and returns the interpolated image and the scale coefficient. '''
     extension = sequence.split('.')
     LOI = False
     if extension[-1] != "mat" and extension[-1] != "tiff":
@@ -35,11 +35,10 @@ def load_data(sequence: str,
         return load_TIFF_image(sequence=sequence, spatial_res=spatial_res, CF_path=p.PATH_TO_CF)
 # ----------------------------------------------------------------
 def load_DICOM_sequence(sequence: str, spatial_res: int, full_seq: bool):
-
+    ''' Loads the first frame or the sequence stored in DICOM and returns the interpolated image(s) and the scale coefficient. '''
     sq = dcmread(sequence)
-    spatial_resY = sq.SequenceOfUltrasoundRegions[0].PhysicalDeltaY
+    spatial_res_y = sq.SequenceOfUltrasoundRegions[0].PhysicalDeltaY
     sq = sq.pixel_array
-    dimension = sq.shape  # get the dimension of the sequence
     firstFrame = np.uint8(rgb2gray(sq[0,]) * 255)
 
     if full_seq == True:
@@ -50,9 +49,7 @@ def load_DICOM_sequence(sequence: str, spatial_res: int, full_seq: bool):
         for i in range(dimSq[0]):
             out[i, :, :] = np.float32(rgb2gray(sq[i,]) * 255)
 
-        out, scale = sequence_preprocessing(sequence = out,
-                                           currentspatial_res = spatial_resY,
-                                           spatial_res = spatial_res)
+        out, scale = sequence_preprocessing(sequence = out, current_spatial_res = spatial_res_y, spatial_res = spatial_res)
 
     elif full_seq == False:
         dimSq = sq.shape
@@ -60,45 +57,45 @@ def load_DICOM_sequence(sequence: str, spatial_res: int, full_seq: bool):
 
         # --- get the first image of the sequence
         out[0,] = np.float32(rgb2gray(sq[0,]) * 255)
-        out, scale = sequence_preprocessing(sequence=out,
-                                           currentspatial_res=spatial_resY,
-                                           spatial_res=spatial_res)
+        out, scale = sequence_preprocessing(sequence=out, current_spatial_res=spatial_res_y, spatial_res=spatial_res)
 
-    return out, scale, spatial_resY, firstFrame
+    return out, scale, spatial_res_y, firstFrame
 # ----------------------------------------------------------------
 def load_MAT_sequence(sequence: str, spatial_res: int, full_seq: bool):
+    ''' Loads the first frame or the sequence stored in MAT and returns the interpolated image(s) and the scale coefficient. '''
     data = scipy.io.loadmat(sequence)
     seq = data['ImgTmp']
     seq = np.moveaxis(seq, -1, 0)
-    spatial_resY = 0.0034
+    spatial_res_y = 0.0034
     firstFrame = seq[0,:,:].copy()
 
     if full_seq == True:
         out, scale = sequence_preprocessing(sequence = seq,
-                                           currentspatial_res = spatial_resY,
+                                           current_spatial_res = spatial_res_y,
                                            spatial_res = spatial_res)
 
     elif full_seq == False:
         out, scale = sequence_preprocessing(sequence=np.expand_dims(seq[0,], axis=0),
-                                           currentspatial_res=spatial_resY,
+                                           current_spatial_res=spatial_res_y,
                                            spatial_res=spatial_res)
 
-    return out, scale, spatial_resY, firstFrame
+    return out, scale, spatial_res_y, firstFrame
 # ----------------------------------------------------------------
 def load_MAT_image(sequence: str, spatial_res: int):
+    ''' Loads the first frame of a sequence stored in MAT and returns the interpolated image and the scale coefficient. '''
     data = scipy.io.loadmat(sequence)
     seq = data['ima']
-    spatial_resY = 0.0067
+    spatial_res_y = 0.0067
     firstFrame = seq.copy()
 
     out, scale = sequence_preprocessing(sequence=np.expand_dims(seq, axis=0),
-                                       currentspatial_res=spatial_resY,
+                                       current_spatial_res=spatial_res_y,
                                        spatial_res=spatial_res)
 
-    return out, scale, spatial_resY, firstFrame
+    return out, scale, spatial_res_y, firstFrame
 # ----------------------------------------------------------------
 def load_TIFF_image(sequence: str, spatial_res: int, CF_path: str):
-    ''' Load tiff image and apply preprocessing -> vertical interpolation in order to reach a homogenous vertical pixel size for all image in the database. '''
+    ''' Load tiff image and returns the interpolated image and the scale coefficient. '''
     seq = plt.imread(sequence)
     if len(seq.shape) == 3:
         seq = seq[:,:,0]
@@ -109,20 +106,21 @@ def load_TIFF_image(sequence: str, spatial_res: int, CF_path: str):
 
     out, scale = sequence_preprocessing(sequence=np.expand_dims(seq, axis=0),
                                        current_spatial_res=spatial_res_y,
-                                       spatial_resolution=spatial_res)
+                                       spatial_res=spatial_res)
 
     return out, scale, spatial_res_y, firstFrame
 # ----------------------------------------------------------------
 def read_CF_directory(path: str):
+    ''' Read calibration factor. '''
     f = open(path, "r")
     val = f.readline().split(' \n')
     return float(val[0])/10
 # ----------------------------------------------------------------
-def sequence_preprocessing(sequence: str, current_spatial_res: int, spatial_resolution: int):
-
+def sequence_preprocessing(sequence: str, current_spatial_res: float, spatial_res: float):
+    ''' Sequence preprocessing -> vertical interpolation to reach a vertical pixel size of spatial_resolution. '''
     dimFrame = sequence.shape
     heightFrame = dimFrame[1]
-    scale = (current_spatial_res * 10000) / spatial_resolution
+    scale = (current_spatial_res * 10000) / spatial_res
     height_tmp = round(scale * heightFrame)
 
     scale = height_tmp / heightFrame

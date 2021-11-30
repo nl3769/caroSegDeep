@@ -14,10 +14,7 @@ from functions.load_datas import load_data
 
 class sequenceClass():
     ''' sequenceClass calls all the other classes to perform the calculations. This class contains all the results and runs the sliding window (sliding_window_vertical_scan). '''
-    def __init__(self,
-                 sequence_path: str,
-                 patient_name: str,
-                 p):
+    def __init__(self, sequence_path: str, patient_name: str, p):
 
         self.desired_spatial_res = p.DESIRED_SPATIAL_RESOLUTION
         self.full_seq = p.PROCESS_FULL_SEQUENCE
@@ -154,17 +151,15 @@ class sequenceClass():
         ''' Saves IMT value using annotationClass. '''
         self.annotationClass.mapAnnotation = self.annotationClass.mapAnnotation[1:,]
         IMTMeanValue, IMTMedianValue = self.annotationClass.IMT()
-        # plotting the points
-        # convert in micro meter
-        newSpatialResolution = self.spacing /self.scale * 10000 # in micro meter
+        spatial_res = self.spacing /self.scale * 10000 # in micro meter
 
         plt.rcParams.update({'font.size': 16})
         plt.subplot(211)
-        plt.plot(IMTMeanValue*newSpatialResolution, "b")
+        plt.plot(IMTMeanValue*spatial_res, "b")
         plt.ylabel('Thickness in $\mu$m')
         plt.legend(['Mean'], loc='lower right')
         plt.subplot(212)
-        plt.plot(IMTMedianValue*newSpatialResolution, "r")
+        plt.plot(IMTMedianValue*spatial_res, "r")
         plt.ylabel('Thickness in $\mu$m')
         plt.xlabel('Frame ID')
         plt.legend(['Median'], loc='lower right')

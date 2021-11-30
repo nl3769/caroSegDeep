@@ -38,7 +38,7 @@ class datasetBuilder():
                 borders = load_borders(os.path.join(self.p.PATH_TO_BORDERS, files_cubs[img_index].split('.')[0] + "_borders.mat"))
                 # --- load annotation
                 mat = load_annotation(self.p.PATH_TO_CONTOUR, files_cubs[img_index], self.p.EXPERT)
-                # --- extracts patch for the current image
+                # --- extract patch for the current image
                 datas_, self.im_nb = patch_extraction(img=img_f,
                                                       manual_del=mat,
                                                       borders=borders,
@@ -51,7 +51,7 @@ class datasetBuilder():
                                                       spatial_res_x=spatial_resolution_x,
                                                       desired_spatial_res=self.p.SPATIAL_RESOLUTION,
                                                       img_nb=self.im_nb)
-                # --- we add to self.dic_datas if patches were extracted
+                # --- add to self.dic_datas if patches were extracted
                 if datas_ != "skipped":
                     self.dic_datas[files_cubs[img_index]] = datas_
         skipped_sequences.close()
@@ -66,18 +66,18 @@ class datasetBuilder():
         unseen_images.close()
     # ------------------------------------------------------------------------------------------------------------------
     def save_dic_to_HDF5(self, path):
-        ''' Saves patches in .h5 file with train/validation/test sets. '''
+        ''' Save patches in .h5 file with train/validation/test sets. '''
         f = h5py.File(path, "w")
         for key in self.dic_datas.keys():
             print(f"The {key} set is being written.")
 
             gr = key
-            tmpGr = f.create_group(name=gr)
+            tmp_gr = f.create_group(name=gr)
 
-            tmp_gr_mask = tmpGr.create_group(name="masks")                      # groupe for mask
-            tmp_gr_img = tmpGr.create_group(name="img")                         # groupe for patch (img)
-            tmp_gr_patient_name = tmpGr.create_group(name="patientName")        # groupe for name
-            tmp_gr_sr = tmpGr.create_group(name="spatial_resolution")           # groupe for spatial resolution (used for hausdorff distance)
+            tmp_gr_mask = tmp_gr.create_group(name="masks")                      # groupe for mask
+            tmp_gr_img = tmp_gr.create_group(name="img")                         # groupe for patch (img)
+            tmp_gr_patient_name = tmp_gr.create_group(name="patientName")        # groupe for name
+            tmp_gr_sr = tmp_gr.create_group(name="spatial_resolution")           # groupe for spatial resolution (used for hausdorff distance)
 
             data = self.dic_datas[key]
 

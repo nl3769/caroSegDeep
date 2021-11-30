@@ -20,8 +20,7 @@ def patch_extraction(img: np.ndarray,
                      desired_spatial_res: int,
                      img_nb: int):
 
-    ''' This function extracts patches (mask and image), and write skipped images in .txt. An image is skipped if its annoation is done on less than width_window pixels. '''
-
+    ''' Extracts patches (mask and image), and write skipped images in .txt. An image is skipped if its annotation is done on less than width_window. '''
 
     dim = img.shape
     left_border = borders[0]

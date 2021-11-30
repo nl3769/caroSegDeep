@@ -15,12 +15,7 @@ class annotationClass():
         - initialize the annotation maps
         - compute the intima-media thickness '''
 
-    def __init__(self,
-                 dimension: tuple,
-                 first_frame: np.ndarray,
-                 scale: float,
-                 overlay: int,
-                 patient_name: str):
+    def __init__(self, dimension: tuple, first_frame: np.ndarray, scale: float, overlay: int, patient_name: str):
 
         self.map_annotation = np.zeros((dimension[0] + 1, dimension[2], 2))
         self.patient = patient_name
@@ -96,7 +91,7 @@ class annotationClass():
         return np.mean(IMT, axis=1), np.median(IMT, axis=1)
     # ------------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def yPosition(xLeft, width, height, map):
+    def yPosition(xLeft: int, width: int, height: int, map: p.ndarray):
         ''' Compute the y position on which the current patch will be centered. '''
         xRight = xLeft + width
 
