@@ -21,7 +21,7 @@ from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import dice_bce_los
 
 from caroSegDeepBuildModel.functionsCaroSeg.save_history import save_IOU, save_loss, save_DICE
 
-from caroSegDeepBuildModel.classKeras.data_generator import DataGenerator1Channel
+from caroSegDeepBuildModel.classKeras.data_generator import dataGenerator
 from caroSegDeepBuildModel.classKeras.custom_callback import CustomLearningRateScheduler, lr_schedule
 
 from caroSegDeepBuildModel.functionsCaroSeg.check_dir import chekDir
@@ -40,9 +40,9 @@ def train(p):
     # --- parameters for validation generator
     params_val = {'dim': dim_img + (1,), 'batch_size': 1, 'shuffle': False}
     # --- training generator
-    training_generator = DataGenerator1Channel(partitions = data["train"]["img"], labels = data["train"]["masks"],  data_augmentation = p.DATA_AUGMENTATION, **params_training)
+    training_generator = dataGenerator(partitions = data["train"]["img"], labels = data["train"]["masks"],  data_augmentation = p.DATA_AUGMENTATION, **params_training)
     # --- validation generator
-    validation_generator = DataGenerator1Channel(partitions = data["validation"]["img"], labels = data["validation"]["masks"], data_augmentation=False, **params_val)
+    validation_generator = dataGenerator(partitions = data["validation"]["img"], labels = data["validation"]["masks"], data_augmentation=False, **params_val)
     # --- path where the results will be saved: figures + model + metrics
     chekDir(os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT))
     model = model_selection(model_name = p.MODEL_SELECTION, input_shape = dim_img + (1,), patch_width = p.PATCH_WIDTH)
