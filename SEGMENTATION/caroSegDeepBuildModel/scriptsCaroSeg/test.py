@@ -12,13 +12,13 @@ import cv2
 from medpy.metric.binary import dc, hd
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import binary_cross_entropy, dice_bce_constraint_MAE, dice_bce_constraint_thickness
+from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import dice_bce_loss, dice_bce_constraint_MAE, dice_bce_constraint_thickness
 from caroSegDeepBuildModel.KerasSegmentationFunctions.utils import plot_org_gt_pred
 from caroSegDeepBuildModel.KerasSegmentationFunctions.metrics import iou, dice_coef
 from caroSegDeepBuildModel.functionsCaroSeg.model_selection import *
-from caroSegDeepBuildModel.classKeras.data_generator import DataGenerator1Channel
+from caroSegDeepBuildModel.classKeras.data_generator import dataGenerator
 
 # ----------------------------------------------------------------
 def test(p, set):
@@ -27,30 +27,21 @@ def test(p, set):
 
     # --- get set
     data = h5py.File(os.path.join(p.PATH_TO_DATASET), 'r')
-
     # --- get the dimension of an images for parameters
     dim_img = data[set]["img"][list(data[set]["img"].keys())[0]][()].shape
-
     # --- parameters for generator
     params_test = {'dim': dim_img + (1,), 'batch_size': 16, 'shuffle': False}
-
     # --- test generator
-    test_generator = DataGenerator1Channel(partitions=data[set]["img"], labels=data[set]["masks"], data_augmentation=False, **params_test)
-
+    test_generator = dataGenerator(partitions=data[set]["img"], labels=data[set]["masks"], data_augmentation=False, **params_test)
     # --- name of the model
     model_filename = os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT, p.MODEL_SELECTION + '.h5')
-
     # --- load the model
     model = model_selection(model_name=p.MODEL_SELECTION, input_shape=(512, 128, 1))
     model.load_weights(model_filename)
-    
     # --- display the network
     model.summary()
-    
     # --- compile the network
     model.compile(optimizer="adam", loss = globals()[p.LOSS], metrics=[iou, dice_coef])
-
-
     # --- Evaluation
     loss_value, iou_value, dice_coef_val = model.evaluate(test_generator, batch_size=1, verbose=1)
     pdf_file_name = os.path.splitext(model_filename)[0] + "_" + set + ".pdf"
