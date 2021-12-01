@@ -8,7 +8,7 @@ import imgaug.augmenters as iaa
 import random
 import tensorflow.keras
 
-class DataGenerator1Channel(tensorflow.keras.utils.Sequence):
+class dataGenerator(tensorflow.keras.utils.Sequence):
 
     def __init__(self, partitions, labels, data_augmentation, batch_size=16, dim=(512, 128, 1),  shuffle=True):
         ''' DataGenerator1Channel apply on the fly data augmentation by using imgaug. '''
