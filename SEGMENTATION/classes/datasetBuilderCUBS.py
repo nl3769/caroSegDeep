@@ -38,7 +38,6 @@ def patch_extraction(img: np.ndarray,
     height_i = dim[0]
     width_i = dim[1]
     LI = manual_del[0]
-    MA = manual_del[1]LI = manual_del[0]
     MA = manual_del[1]
     # --- initialization
     condition = True
