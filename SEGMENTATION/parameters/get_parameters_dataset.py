@@ -10,7 +10,7 @@ from shutil import copyfile
 # 2) Indicate all the variables according to your local environment and experiment
 # 3) Use your own "setParameters.py" file to run the code
 # 4) Do not commit/push your own "setParameters.py" file to the collective repository, it is not relevant for other people
-# 5) The untracked file "setParameters.py" is automatically copied to the tracked file "getParameters.py" for reproductibility
+# 5) The untracked file "setParameters.py" is automatically copied to the tracked file "getParameters.py" for reproducibility
 # ****************************************************************
 
 def createDirectory(path):

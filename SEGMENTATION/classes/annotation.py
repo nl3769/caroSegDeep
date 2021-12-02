@@ -45,14 +45,14 @@ class annotationClass():
     # ------------------------------------------------------------------------------------------------------------------
     def update_annotation(self, previous_mask: np.ndarray, frame_ID: int, offset: int):
         ''' Computes the position of the LI and MA interfaces according to the predicted mask. '''
-        # --- window of +/- neighbours pixels where the algorithm search the borders
+        # --- window of +/- neighbours pixels where the algorithm searches the borders
         neighours = 30  
         # --- the algorithm starts from the left to the right
         x_start = self.borders_ROI['leftBorder']
         x_end = self.borders_ROI['rightBorder']
         # --- dimension of the mask
         dim = previous_mask.shape
-        # --- we extract the biggest connexe region
+        # --- we extract the biggest connected region
         previous_mask[previous_mask > 0.5] = 1
         previous_mask[previous_mask < 1] = 0
         previous_mask = get_biggest_connexe_region(previous_mask)

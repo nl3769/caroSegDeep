@@ -32,7 +32,7 @@ class predictionClass():
         self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, 'wall.h5'))
     # ------------------------------------------------------------------------------------------------------------------
     def prediction_masks(self, id: int, pos: dict):
-        """ Retrieves pacthes, then preprocessing is applied and the self.build_maps method reassembles them. """
+        """ Retrieves patches, then preprocessing is applied and the self.build_maps method reassembles them. """
         patchImg = []
         for i in range(len(self.patches)):
             patchImg.append(self.patches[i]["patch"])

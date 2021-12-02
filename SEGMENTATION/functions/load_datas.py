@@ -161,7 +161,7 @@ def read_CF_file(path: str):
     return float(val[0])/10
 # ----------------------------------------------------------------
 def load_annotation(path: str, patient: str, nameExpert: str):
-    ''' Loads annotation stored in .mat file. The function returns two vetors corresponding to LI and MA interfaces.'''
+    ''' Loads annotation stored in .mat file. The function returns two vectors corresponding to LI and MA interfaces.'''
     path_IFC3 = path + '/' + patient.split('.')[0] + "_IFC3_" + nameExpert + ".mat"
     path_IFC4 = path + '/' + patient.split('.')[0] + "_IFC4_" + nameExpert + ".mat"
 

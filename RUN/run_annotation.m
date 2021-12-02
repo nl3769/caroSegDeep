@@ -1,15 +1,15 @@
 close all; 
-clear all;
+clearvars;
 
 addpath('../CREATE_REFERENCES_CUBS/')
 run('set_parameters')
 % load('parameters.mat')
 
  
-path_annotations_A1 = p.PATH_TO_ANNOTATION_A1 ;
-path_annotations_A1_bis = p.PATH_TO_ANNOTATION_A1_BIS ;
-path_annotations_A2 = p.PATH_TO_ANNOTATION_A2 ;
-path_annotations_A3 = p.PATH_TO_ANNOTATION_A3 ;
+path_annotations_A1 = p.PATH_TO_ANNOTATION_A1;
+path_annotations_A1_bis = p.PATH_TO_ANNOTATION_A1_BIS;
+path_annotations_A2 = p.PATH_TO_ANNOTATION_A2;
+path_annotations_A3 = p.PATH_TO_ANNOTATION_A3;
 
 
 files_A1 = loadData.load_files(path_annotations_A1);
@@ -47,10 +47,10 @@ while size(names_patient, 2)>1
     [LI_int_A2, MA_int_A2, borders_A2]=interpolation.interfaces_interpolation_pchip(LI_A2, MA_A2);  
     
     % --- load the matching image
-    path_to_Image = p.PATH_TO_IMAGES;
+    path_to_image = p.PATH_TO_IMAGES;
     name_=split(fileName, '-');
     name_=name_{1};
-    image_name=strcat(path_to_Image, name_, '.tiff');
+    image_name=strcat(path_to_image, name_, '.tiff');
     image=loadData.load_image(image_name);
 
     % --- we modify the image

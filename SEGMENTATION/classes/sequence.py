@@ -39,7 +39,7 @@ class sequenceClass():
         self.final_mask_after_post_processing = np.zeros(self.sequence.shape[1:])
     # ------------------------------------------------------------------------------------------------------------------
     def sliding_window_vertical_scan(self):
-        ''' At each position, three patches are extracted, and if the difference between the min and the max then the vertical scanning is automacally adjusted. '''
+        ''' At each position, three patches are extracted, and if the difference between the min and the max then the vertical scanning is automatically adjusted. '''
         condition = True
         t = time.time()
         for frame_ID in range(self.sequence.shape[0]):

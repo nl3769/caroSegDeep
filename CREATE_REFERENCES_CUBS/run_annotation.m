@@ -1,5 +1,5 @@
 close all; 
-clear all;
+clearvars;
 
 % --- we get parameters
 run('set_parameters')

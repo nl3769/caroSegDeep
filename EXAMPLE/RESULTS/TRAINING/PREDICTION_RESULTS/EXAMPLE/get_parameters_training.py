@@ -10,7 +10,7 @@ from shutil import copyfile
 # 2) Indicate all the variables according to your local environment and experiment
 # 3) Use your own "setParameters.py" file to run the code
 # 4) Do not commit/push your own "setParameters.py" file to the collective repository, it is not relevant for other people
-# 5) The untracked file "setParameters.py" is automatically copied to the tracked file "getParameters.py" for reproductibility
+# 5) The untracked file "setParameters.py" is automatically copied to the tracked file "getParameters.py" for reproducibility
 # ****************************************************************
 
 def create_directory(path):
@@ -28,9 +28,9 @@ def getParameters():
 
   p = Parameters(
     # --- relative to the training phase
-    NB_EPOCH=2,                                 # Number of training epochs
-    NBPATIENCE_EPOCHS=30,                        # The training is stopped if the loss on validation data does not improve after NBPATIENCE_EPOCHS epochs
-    BATCH_SIZE=2,                                # select the batch size
+    NB_EPOCH=2,                                   # Number of training epochs
+    NBPATIENCE_EPOCHS=30,                         # The training is stopped if the loss on validation data does not improve after NBPATIENCE_EPOCHS epochs
+    BATCH_SIZE=2,                                 # select the batch size
     DATA_AUGMENTATION=True,                       # True to apply data augmentation on training sets only
     MODEL_SELECTION='custom_dilated_unet',        # The name of the desired architecture
     LEARNING_RATE=0.001,                          # The starting value of the learning rate

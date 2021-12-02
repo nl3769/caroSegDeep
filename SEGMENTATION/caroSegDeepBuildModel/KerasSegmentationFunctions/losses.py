@@ -31,7 +31,7 @@ def constraint_MAE(y_true, y_pred):
     return res
 
 def threshold_binarize(x, threshold=0.5):
-    ''' Binarize the prediction usging a treshold. '''
+    ''' Binarize the prediction using a threshold. '''
     ge = tensorflow.greater_equal(x, tensorflow.constant(threshold))
     y = tensorflow.where(ge, x=tensorflow.ones_like(x), y=tensorflow.zeros_like(x))
 
