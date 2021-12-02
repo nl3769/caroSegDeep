@@ -1,13 +1,13 @@
-The main functions are in scripts/. There are five possibilities:
+The three main functions are in 'caroSegDeep/SEGMENTATION/scripts/'. The argument parameters are detailed in 'caroSegDeep/SEGMENTATION/parameters/set_parameters_*.py'.
 
 # --- 1
 run_far_wall_detection.py
--> Detection of the far wall. Results are saved in.txt file.  The argument of the code is set_parameters_*.py in which the variables are explained (in parameters/).
+-> Detection of the far wall. Results are saved in .txt files.
 
 # --- 2
 run_segmentation_automatic.py
--> Automatic segmentation of the IMC. The code automatically load the roght and the left border, any interaction is recquired. The argument of the code is set_parameters_*.py in which the variables are explained (in parameters/).
+-> Fully-automatic segmentation of the IMC. The code automatically load the right and the left border. No interaction is required.
 
 # --- 3
 run_segmentation.py
--> Semi automatic segmentation of the IMC. The code can load the results of run_far_wall_detection.py, the experts' annotation or the GUI can be used to manually initalize the method. The argument of the code is set_parameters_*.py in which the variables are explained (in parameters/).
+-> Semi-automatic segmentation of the IMC. The code can either load the results of 'run_far_wall_detection.py', or the experts manual annotations, or the GUI can be used to manually initialize the method.
