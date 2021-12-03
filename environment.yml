@@ -25,10 +25,10 @@ dependencies:
   - brunsli=0.1=h2531618_0
   - bzip2=1.0.8=h7b6447c_0
   - c-ares=1.17.1=h27cfd23_0
-  - ca-certificates=2021.10.8=ha878542_0
+  - ca-certificates=2021.10.26=h06a4308_2
   - cachetools=4.2.4=pyhd8ed1ab_0
   - cairo=1.16.0=h6cf1ce9_1008
-  - certifi=2021.10.8=py38h578d9bd_1
+  - certifi=2021.10.8=py38h06a4308_0
   - cffi=1.15.0=py38h3931269_0
   - cfitsio=3.470=hf0d0db6_6
   - charls=2.2.0=h2531618_0
@@ -142,6 +142,7 @@ dependencies:
   - libzlib=1.2.11=h36c2ea0_1013
   - libzopfli=1.0.3=he6710b0_0
   - llvm-openmp=12.0.1=h4bd325d_1
+  - llvmlite=0.37.0=py38h295c915_1
   - locket=0.2.1=py38h06a4308_1
   - lz4-c=1.9.3=h295c915_1
   - markdown=3.3.6=pyhd8ed1ab_0
@@ -161,14 +162,15 @@ dependencies:
   - networkx=2.6.3=pyhd3eb1b0_0
   - nspr=4.32=h9c3ff4c_1
   - nss=3.72=hb5efdd6_0
-  - numpy=1.21.2=py38h20f2e39_0
-  - numpy-base=1.21.2=py38h79a1101_0
+  - numba=0.54.1=py38h51133e4_0
+  - numpy=1.20.3=py38hf144106_0
+  - numpy-base=1.20.3=py38h74d4b33_0
   - oauthlib=3.1.1=pyhd8ed1ab_0
   - olefile=0.46=pyhd3eb1b0_0
   - opencv=4.5.3=py38h578d9bd_1
   - openh264=2.1.1=h780b84a_0
   - openjpeg=2.4.0=h3ad879b_0
-  - openssl=1.1.1l=h7f98852_0
+  - openssl=1.1.1l=h7f8727e_0
   - opt_einsum=3.3.0=pyhd8ed1ab_1
   - packaging=21.3=pyhd3eb1b0_0
   - pango=1.48.10=hb8ff022_1
@@ -215,6 +217,7 @@ dependencies:
   - six=1.15.0=py_0
   - snappy=1.1.8=he6710b0_0
   - sqlite=3.36.0=hc218d9a_0
+  - tbb=2021.4.0=hd09550d_0
   - tensorboard=2.7.0=pyhd8ed1ab_0
   - tensorboard-data-server=0.6.0=py38h3e25421_1
   - tensorboard-plugin-wit=1.8.0=pyh44b312d_0
