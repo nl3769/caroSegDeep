@@ -91,7 +91,7 @@ class annotationClass():
         return np.mean(IMT, axis=1), np.median(IMT, axis=1)
     # ------------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def yPosition(xLeft: int, width: int, height: int, map: p.ndarray):
+    def yPosition(xLeft: int, width: int, height: int, map: np.ndarray):
         ''' Compute the y position on which the current patch will be centered. '''
         xRight = xLeft + width
 

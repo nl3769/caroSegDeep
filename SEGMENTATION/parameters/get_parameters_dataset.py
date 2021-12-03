@@ -27,11 +27,10 @@ def createDirectory(path):
 def getParameters():
 
   p = Parameters(
-
-    PATH_TO_SEQUENCES='/home/laine/cluster/PROJECTS_IO/DATA/MEIBURGER/images',  # Path where the sequences/images are saved (.tiff, .DICOM, .MAT)
-    PATH_TO_BORDERS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/BORDERS/BORDERS_A1',                         # Path where the borders are saved (.mat)
-    PATH_TO_CONTOUR='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/CONTOURS/A1',                                # Path where the contours are saved (.mat, .txt)
-    PATH_TO_CF='/home/laine/cluster/PROJECTS_IO/DATA/MEIBURGER/CF',                             # Patch where the calibration factor is saved
+    PATH_TO_SEQUENCES='/home/laine/Documents/PROJECTS_IO/DATA/MEIBURGER/DATASET_for_CREATIS/images',        # Path where the sequences/images are saved (.tiff, .DICOM, .MAT)
+    PATH_TO_BORDERS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/BORDERS/BORDERS_A1',    # Path where the borders are saved (.mat)
+    PATH_TO_CONTOUR='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/CONTOURS/A1',           # Path where the contours are saved (.mat, .txt)
+    PATH_TO_CF='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/CF',                                    # Patch where the calibration factor is saved
     EXPERT='A1',                                                            # Name of the expert
     DATABASE_NAME = ['CUBS'],                                               # Name of the database
     PATH_TO_SAVE_DATASET='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/DATASET',             # path to save the dataset in h5 format
@@ -41,7 +40,6 @@ def getParameters():
     PATCH_WIDTH=128,                # The width of a patch
     PATCH_OVERLAY=28,               # Number of overlapping pixels when the patch is moved
     SPATIAL_RESOLUTION=5,           # The desired spatial resolution by column
-
   )
 
   # --- Print all attributes in the console
