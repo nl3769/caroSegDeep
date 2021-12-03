@@ -6,8 +6,8 @@ classdef interpolation
             % load annotaion         
             tmp=split(fileName, '-');
             tmp=tmp{1};            
-            pathToLI=strcat(path, tmp, '-LI.txt');
-            pathToMA=strcat(path, tmp, '-MA.txt');
+            pathToLI=fullfile(path, tmp, '-LI.txt');
+            pathToMA=fullfile(path, tmp, '-MA.txt');
             LI=load(pathToLI);
             MA=load(pathToMA);                       
         end       
