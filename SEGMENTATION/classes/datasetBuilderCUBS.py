@@ -3,128 +3,91 @@
 @Contact :   <nolann.laine@outlook.fr>
 '''
 
+import h5py
+
+from tqdm import tqdm
+import os
 import numpy as np
-import cv2
-import _io
+from functions.load_datas import load_borders, load_tiff, load_annotation, get_files
+from functions.patch_extraction import patch_extraction
+from functions.split_data import split_data_fold
 
-def patch_preprocessing(patch: np.ndarray):
-    ''' Spread grayscale values in the interval [0, 255]. '''
-    min_ = np.min(patch)
-    patch=(patch-min_)
-    max_ = np.max(patch)
-    coef_ =255/max_
-    patch_img_center=patch * coef_
+class datasetBuilder():
+    def __init__(self, p):
+        ''' Computes dataset according to CUBS database. '''
+        self.window = p.PATCH_WIDTH
+        self.overlay = p.PATCH_OVERLAY
+        self.scale = p.SCALE
+        self.dic_datas = {}
+        self.im_nb = 0
+        self.p = p
+    # ------------------------------------------------------------------------------------------------------------------
+    def build_data(self):
+        ''' build_data computes and write the dataset in .h5 file. The h5 contains training, validation and validation set. '''
+        skipped_sequences=open(os.path.join(self.p.PATH_TO_SKIPPED_SEQUENCES, "skipped_sequences.txt"), "w") # contains images that cannot be incorporated into the data set
+        # --- loop is required if more than one database is used. It not necessary for CUBS
+        for data_base in self.p.DATABASE_NAME:
+            files_cubs = get_files(self.p.PATH_TO_SEQUENCES) # name of all images in self.p.PATH_TO_SEQUENCES
+            # --- loop over all the images in the database
+            # for img_index in tqdm(range(len(files_cubs)), ascii=True, desc='Patch (Mask + image): ' + data_base):
+            for img_index in tqdm(range(len(files_cubs)), ascii=True, desc='Patch (Mask + image): ' + data_base):
+                # --- load the image and the calibration factor
+                spatial_res_y, img_f = load_tiff(os.path.join(self.p.PATH_TO_SEQUENCES, files_cubs[img_index]), PATH_TO_CF=self.p.PATH_TO_CF)
+                spatial_resolution_x = spatial_res_y
+                # --- load left and right borders
+                borders = load_borders(os.path.join(self.p.PATH_TO_BORDERS, files_cubs[img_index].split('.')[0] + "_borders.mat"))
+                # --- load annotation
+                mat = load_annotation(self.p.PATH_TO_CONTOUR, files_cubs[img_index], self.p.EXPERT)
+                # --- extract patch for the current image
+                datas_, self.im_nb = patch_extraction(img=img_f,
+                                                      manual_del=mat,
+                                                      borders=borders,
+                                                      width_window=self.window,
+                                                      overlay=self.overlay,
+                                                      name_seq=files_cubs[img_index],
+                                                      resize_col=self.scale,
+                                                      skipped_sequences=skipped_sequences,
+                                                      spatial_res_y=spatial_res_y,
+                                                      spatial_res_x=spatial_resolution_x,
+                                                      desired_spatial_res=self.p.SPATIAL_RESOLUTION,
+                                                      img_nb=self.im_nb)
+                # --- add to self.dic_datas if patches were extracted
+                if datas_ != "skipped":
+                    self.dic_datas[files_cubs[img_index]] = datas_
+        skipped_sequences.close()
+        print("Total image: ", self.im_nb)
+        data = self.dic_datas.copy()
+        unseen_images = open(os.path.join(self.p.PATH_TO_SKIPPED_SEQUENCES, "unseen_images.txt"), "w")
+        self.dic_datas = split_data_fold(data=data,
+                                         file=unseen_images,
+                                         p=self.p)
+        self.save_dic_to_HDF5(path=os.path.join(self.p.PATH_TO_SAVE_DATASET, self.p.DATABASE_NAME[0]+ ".h5"))
 
-    return patch_img_center
+        unseen_images.close()
+    # ------------------------------------------------------------------------------------------------------------------
+    def save_dic_to_HDF5(self, path):
+        ''' Save patches in .h5 file with train/validation/test sets. '''
+        f = h5py.File(path, "w")
+        for key in self.dic_datas.keys():
+            print(f"The {key} set is being written.")
 
-def patch_extraction(img: np.ndarray,
-                     manual_del: tuple,
-                     borders: tuple,
-                     width_window: int,
-                     overlay: _io.TextIOWrapper,
-                     name_seq: str,
-                     resize_col: bool,
-                     skipped_sequences,
-                     spatial_res_y: float,
-                     spatial_res_x: float,
-                     desired_spatial_res: int,
-                     img_nb: int):
+            gr = key
+            tmp_gr = f.create_group(name=gr)
 
-    ''' Extracts patches (mask and image), and write skipped images in .txt. An image is skipped if its annotation is done on less than width_window. '''
-    # --- get information
-    dim = img.shape
-    left_border = borders[0]
-    right_border = borders[1]
-    height_i = dim[0]
-    width_i = dim[1]
-    LI = manual_del[0]
-    MA = manual_del[1]
-    # --- initialization
-    condition = True
-    inc = 0
+            tmp_gr_mask = tmp_gr.create_group(name="masks")                      # groupe for mask
+            tmp_gr_img = tmp_gr.create_group(name="img")                         # groupe for patch (img)
+            tmp_gr_patient_name = tmp_gr.create_group(name="patientName")        # groupe for name
+            tmp_gr_sr = tmp_gr.create_group(name="spatial_resolution")           # groupe for spatial resolution (used for hausdorff distance)
 
-    if resize_col == True:
-        # --- vertical interpolation to achieve a uniform vertical pixel size
-        height_patch = 512
-        scale = (spatial_res_y * 10000) / desired_spatial_res
-        height_tmp = round(scale * height_i)
-        scale = height_tmp / height_i
-        height_i = height_tmp
-        LI = scale * LI
-        MA = scale * MA
-        img = cv2.resize(img.astype(np.float32), (width_i, height_i), interpolation=cv2.INTER_LINEAR)
-    else:
-        height_patch = 128
-        scale = 1
+            data = self.dic_datas[key]
 
-    stop_ = True # variable used to stop the extraction
-    if (right_border - left_border) >= width_window:
-        # --- dictionary that contains the data
-        dic_datas = {'patch_mask': {},
-                     'patch_Image_org': {},
-                     'spatial_resolution': {}}
-        while condition:
-            # -- data extraction
-            patch_m = np.zeros((height_i, width_window))
-            LI_ = LI[left_border:left_border + width_window, 0]
-            MA_ = MA[left_border:left_border + width_window, 0]
-            patch_img = img[:, left_border:left_border + width_window]
-            # -- mask generation
-            for i in range(width_window):
-                LI_val = round(LI_[i])
-                MA_val = round(MA_[i])
-                patch_m[LI_val:MA_val, i] = 255
-                # --- uncomment below to see the position of the LI/MA interface
-                # patch_img[LI_val, i] = 255
-                # patch_img[MA_val, i] = 255
-            # --- compute average position in order to center the patch
-            mean = round(np.mean(np.concatenate((LI_, MA_))))
-            # --- compute the position of the patch/mask
-            lim_inf = int(mean - height_patch / 2)
-            lim_sup = int(mean + height_patch / 2)
-            # --- get masks
-            patch_m_center = patch_m[lim_inf:lim_sup, :]
-            patch_m_bottom = patch_m[lim_inf - int(10 * scale):lim_sup - int(10 * scale), :]
-            patch_m_top = patch_m[lim_inf + int(10 * scale):lim_sup + int(10 * scale), :]
-            # --- get patch an apply preprocessing
-            patch_img_center = patch_img[lim_inf:lim_sup, :]
-            patch_img_center=patch_preprocessing(patch_img_center)
-            # --- get patch an apply preprocessing
-            patch_img_bottom=patch_img[lim_inf - int(10 * scale):lim_sup - int(10 * scale), :]
-            patch_img_bottom=patch_preprocessing(patch_img_bottom)
-            # --- get patch an apply preprocessing
-            patch_img_top = patch_img[lim_inf + int(10 * scale):lim_sup + int(10 * scale), :]
-            patch_img_top=patch_preprocessing(patch_img_top)
-            # --- add to dic_datas
-            # mask
-            dic_datas['patch_mask']['patch_center_' + str(inc) + "_" + name_seq] = patch_m_center.astype(np.uint8)
-            dic_datas['patch_mask']['patch_bottom_' + str(inc) + "_" + name_seq] = patch_m_bottom.astype(np.uint8)
-            dic_datas['patch_mask']['patch_top_' + str(inc) + "_" + name_seq] = patch_m_top.astype(np.uint8)
-            # image
-            dic_datas['patch_Image_org']['patch_center_' + str(inc) + "_" + name_seq] = patch_img_center.astype(np.float32)
-            dic_datas['patch_Image_org']['patch_bottom_' + str(inc) + "_" + name_seq] = patch_img_bottom.astype(np.float32)
-            dic_datas['patch_Image_org']['patch_top_' + str(inc) + "_" + name_seq] = patch_img_top.astype(np.float32)
-            # pixel size
-            dic_datas['spatial_resolution']['patch_center_' + str(inc) + "_" + name_seq] = np.asarray([spatial_res_x, spatial_res_y/scale])  # (deltaX, deltaY)
-            dic_datas['spatial_resolution']['patch_bottom_' + str(inc) + "_" + name_seq] = np.asarray([spatial_res_x, spatial_res_y/scale])
-            dic_datas['spatial_resolution']['patch_top_' + str(inc) + "_" + name_seq] = np.asarray([spatial_res_x, spatial_res_y/scale])
-            # --- update variables
-            inc=inc+1
-            img_nb=img_nb+3 # since three patches are extracted
-            # --- check if the condition is always verified
-            if stop_ == False:
-                condition = False
-            elif ((left_border + overlay + width_window) < right_border):
-                left_border = left_border + overlay
-            elif (left_border + overlay + width_window > right_border):
-                left_border = right_border - width_window
-                stop_ = False
-            else:
-                condition = False
+            # --- Writes information
+            for i in data["masks"].keys():
+                tmp_gr_mask.create_dataset(name=i, data=data["masks"][i], dtype=np.uint8)       # we convert in uint8 order to gain memory usage
+                tmp_gr_img.create_dataset(name=i, data=data["images"][i], dtype=np.float32)
+                tmp_gr_sr.create_dataset(name=i, data=data["spatial_resolution"][i], dtype=np.float32)
 
-        return dic_datas, img_nb
-    else:
-        # --- write a patient that cannot be used in the dataset (typically because the width of the annotation is too small).
-        diff_ = right_border - left_border
-        skipped_sequences.write("Patient name: " + name_seq + ", width window: " + str(diff_) + "\n")
-        return "skipped", img_nb
+            for j in range(len(data["patient_name"])):
+                tmp_gr_patient_name.create_dataset(name="Patient_" + str(j) + "_name", data=data["patient_name"][j])
+
+        f.close()
