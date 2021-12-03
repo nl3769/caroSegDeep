@@ -1,3 +1,6 @@
+%@Author  :   <Nolann Lainé>
+%@Contact :   <nolann.laine@outlook.fr>
+
 close all; 
 clearvars;
 
