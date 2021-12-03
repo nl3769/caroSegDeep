@@ -55,7 +55,7 @@ class annotationClass():
         # --- we extract the biggest connected region
         previous_mask[previous_mask > 0.5] = 1
         previous_mask[previous_mask < 1] = 0
-        previous_mask = get_biggest_connexe_region(previous_mask)
+        previous_mask = get_biggest_connected_region(previous_mask)
         # --- we count the number of white pixels to localize the seed
         white_pixels = np.array(np.where(previous_mask == 1))
         seed = (round(np.mean(white_pixels[0,])), round(np.mean(white_pixels[1,])))
