@@ -23,6 +23,9 @@ id_rect=0;
 inc=1;
 % --- process patient
 while size(names_patient, 2)>1
+    
+    disp(['current patient: ' names_patient{inc}]);
+    
 %     size(names_patient, 2)
     % --- interpolation
     % --- A1 expert
@@ -64,7 +67,6 @@ while size(names_patient, 2)>1
     MA_name = strcat(name_, '-MA.txt');
     % --- we remove the processed patient
     for k=1:1:size(names_patient, 2)
-        disp(['current patient: ' num2str(k)]);
         if strcmp(names_patient{k}, LI_name)
             id_LI=k;
             break
