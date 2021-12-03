@@ -29,6 +29,7 @@ def setParameters():
                 DESIRED_SPATIAL_RESOLUTION=5,       # The desired spatial resolution in um
                 PATH_WALL_SEGMENTATION_RES='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/INFERENCE',         # Path to save results
                 PATH_TO_LOAD_TRAINED_MODEL_WALL='/home/nlaine/Documents/REPO/caroSegDeep/EXAMPLE/TRAINED_MODEL',        # Path where the trained model is saved
+                MODEL_NAME='wall.h5',
   )
 
   # --- Print all attributes in the console

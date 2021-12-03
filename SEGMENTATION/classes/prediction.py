@@ -29,7 +29,7 @@ class predictionClass():
         self.map_overlay, self.map_prediction = {}, {}      # dictionaries evolve during the inference phase
         self.img = img
 
-        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, 'wall.h5'))
+        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, p.MODEL_NAME))
     # ------------------------------------------------------------------------------------------------------------------
     def prediction_masks(self, id: int, pos: dict):
         """ Retrieves patches, then preprocessing is applied and the self.build_maps method reassembles them. """
