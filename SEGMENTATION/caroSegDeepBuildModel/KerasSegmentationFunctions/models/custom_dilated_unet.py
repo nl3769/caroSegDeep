@@ -30,7 +30,6 @@ def encoder(x, filters=44, n_block=3, kernel_size=(3, 3), activation='relu', n_p
     skip_pool_col = []
 
     for i in range(n_pool_col):
-        print(filters*2 ** i)
         x = Conv2D(filters, kernel_size, activation=activation, padding='same', kernel_initializer='glorot_uniform', kernel_regularizer = kernel_regularizer)(x)
         x = BatchNormalization()(x)
         if SE:
@@ -46,7 +45,6 @@ def encoder(x, filters=44, n_block=3, kernel_size=(3, 3), activation='relu', n_p
             x = Dropout(dropout)(x)
 
     for i in range(n_block):
-        print(filters * 2 ** i)
         x = Conv2D(filters * 2 ** i, kernel_size, activation=activation, padding='same', kernel_initializer='glorot_uniform', kernel_regularizer = kernel_regularizer)(x)
         x = BatchNormalization()(x)
         if SE:

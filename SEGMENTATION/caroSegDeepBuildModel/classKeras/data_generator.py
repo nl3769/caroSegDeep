@@ -17,7 +17,7 @@ class dataGenerator(tensorflow.keras.utils.Sequence):
         self.labels = labels
         self.shuffle = shuffle
         self.partitions = partitions
-        self.keys = list(partitions.keys())[0:10]
+        self.keys = list(partitions.keys())
         self.data_augmentation = data_augmentation
         self.seq = iaa.Sequential([iaa.Fliplr(0.5),
                                    iaa.Flipud(0.5),
