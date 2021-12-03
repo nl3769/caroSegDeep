@@ -4,7 +4,7 @@
 close all; 
 clearvars;
 
-addpath('../CREATE_REFERENCES_CUBS/')
+addpath(fullfile('..' , 'CREATE_REFERENCES_CUBS'))
 % --- load parameters in memory
 run('set_parameters')
 % --- load data

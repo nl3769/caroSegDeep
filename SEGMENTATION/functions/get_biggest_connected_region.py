@@ -7,7 +7,7 @@ import numpy as np
 from scipy import ndimage
 from skimage.measure import label
 
-def get_biggest_connexe_region(image):
+def get_biggest_connected_region(image):
 
     img_fill_holes=ndimage.binary_fill_holes(image).astype(int)
     label_image, nbLabels = label(img_fill_holes, return_num=True)

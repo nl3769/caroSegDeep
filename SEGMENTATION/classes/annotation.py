@@ -4,7 +4,7 @@
 '''
 
 from classes.cv2Annotation import cv2Annotation
-from functions.get_biggest_connexe_region import get_biggest_connexe_region
+from functions.get_biggest_connected_region import get_biggest_connected_region
 from numba import jit
 import numpy as np
 
