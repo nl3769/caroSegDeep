@@ -3,7 +3,7 @@
 @Contact :   <nolann.laine@outlook.fr>
 '''
 
-from classes.datasetBuilderCUBS import datasetBuilder
+from classes.datasetBuilderCUBS import datasetBuilderWall, datasetBuilderFarWall
 import argparse
 import importlib
 
@@ -15,7 +15,19 @@ if __name__ == "__main__":
     param = importlib.import_module('parameters.' + arg['Parameters'].split('.')[0])
     # --- we get parameters
     p = param.setParameters()
-    # --- we create datasetBuilder object
-    dataSet = datasetBuilder(p=p)
+
+    # --- we create the datasetBuilderFarWall object to create the dataset used for training a far wall detection model
+    dataSetFarWall = datasetBuilderFarWall(p=p)
     # --- we create the dataset
-    dataSet.build_data()
+    dataSetFarWall.build_data()
+
+    ############################################################
+    ############################################################
+    ############################################################
+    
+    # --- we create the datasetBuilderWall object to create the dataset used to train a IMC segmentation model
+    dataSetWall = datasetBuilderWall(p=p)
+    # --- we create the dataset
+    dataSetWall.build_data()
+
+

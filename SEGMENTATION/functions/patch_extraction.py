@@ -17,18 +17,18 @@ def patch_preprocessing(patch: np.ndarray):
 
     return patch_img_center
 
-def patch_extraction(img: np.ndarray,
-                     manual_del: tuple,
-                     borders: tuple,
-                     width_window: int,
-                     overlay: _io.TextIOWrapper,
-                     name_seq: str,
-                     resize_col: bool,
-                     skipped_sequences,
-                     spatial_res_y: float,
-                     spatial_res_x: float,
-                     desired_spatial_res: int,
-                     img_nb: int):
+def patch_extraction_wall(img: np.ndarray,
+                          manual_del: tuple,
+                          borders: tuple,
+                          width_window: int,
+                          overlay: _io.TextIOWrapper,
+                          name_seq: str,
+                          resize_col: bool,
+                          skipped_sequences,
+                          spatial_res_y: float,
+                          spatial_res_x: float,
+                          desired_spatial_res: int,
+                          img_nb: int):
 
     ''' Extracts patches (mask and image), and write skipped images in .txt. An image is skipped if its annotation is done on less than width_window. '''
     # --- get information
@@ -127,4 +127,82 @@ def patch_extraction(img: np.ndarray,
         # --- write a patient that cannot be used in the dataset (typically because the width of the annotation is too small).
         diff_ = right_border - left_border
         skipped_sequences.write("Patient name: " + name_seq + ", width window: " + str(diff_) + "\n")
+        return "skipped", img_nb
+
+def patch_extraction_far_wall(img,
+                              manual_del,
+                              borders,
+                              width_window,
+                              overlay,
+                              name_seq,
+                              skipped_sequences,
+                              spatial_res_y,
+                              spatial_res_x,
+                              img_nb):
+
+    ''' TODO '''
+
+    dim = img.shape
+    leftB = borders[0]   # this is not a constant\fancyfoot[C]{}
+    rightB = borders[1]  # this is a constant
+
+    height_i = 512
+    scaleCoef = height_i/dim[0]
+    width_i = dim[1]
+
+    condition = True
+    inc = 0
+
+    LI = manual_del[0]
+    MA = manual_del[1]
+
+    img = cv2.resize(img.astype(np.float32), (width_i, height_i), interpolation=cv2.INTER_LINEAR)
+
+    tmpStop = True
+    if (rightB-leftB) >= width_window:
+
+        dic_datas = {'patch_mask': {},
+                     'patch_Image_org': {},
+                     'spatial_resolution': {}}
+
+        while condition:
+
+            LItmp = LI[leftB:leftB + width_window]
+            MAtmp = MA[leftB:leftB + width_window]
+            middlePos = scaleCoef*(LItmp + MAtmp)/2
+
+            patch_img = img[:, leftB:leftB + width_window]
+            tmpMin = np.min(patch_img)
+            patch_img = (patch_img - tmpMin)
+            tmpMax = np.max(patch_img)
+            coef = 255 / tmpMax
+            patch_img = patch_img * coef
+
+            patch_mask = np.zeros(patch_img.shape)
+
+            for k in range(middlePos.shape[0]):
+                patch_mask[round(middlePos[k, 0]):, k] = 255
+
+            dic_datas['patch_mask']['patch_'+ str(inc) + "_" + name_seq] = patch_mask.astype(np.uint8)
+            dic_datas['patch_Image_org']['patch_'+ str(inc) + "_" + name_seq] = patch_img.astype(np.uint8)
+            dic_datas['spatial_resolution']['patch_'+ str(inc) + "_" + name_seq] = np.asarray([spatial_res_x, spatial_res_y/scaleCoef])
+
+            inc+=1
+            img_nb+=1
+
+            if tmpStop == False:
+                condition = False
+            elif ((leftB + overlay + width_window) < rightB):
+                leftB = leftB + overlay
+            elif  (leftB + overlay + width_window > rightB):
+                leftB = rightB - width_window
+                tmpStop = False
+            else:
+                condition = False
+
+        return dic_datas, img_nb
+    else:
+
+        tmp = rightB-leftB
+        skipped_sequences.write("Patient name: " + name_seq + ", width window: " + str(tmp) +  "\n")
         return "skipped", img_nb
