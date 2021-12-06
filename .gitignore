@@ -16,6 +16,7 @@
 *.h5
 *.tiff
 clin_*
+tech_*
 .idea
 get_parameters*
 
