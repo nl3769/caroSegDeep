@@ -1,4 +1,4 @@
-from parameters.parameters_training import Parameters
+from parameters.parameters_caro_seg_deep_training import Parameters
 import os
 from shutil import copyfile
 

@@ -1,4 +1,4 @@
-from parameters.parameters_training import Parameters
+from parameters.parameters_caro_seg_deep_training import Parameters
 import os
 from shutil import copyfile
 
@@ -22,7 +22,7 @@ def create_directory(path):
   else:
     print("Successfully created the directory %s " % path)
 
-def getParameters():
+def setParameters():
 
   p = Parameters(
     # --- relative to the training phase
@@ -58,7 +58,7 @@ def getParameters():
   # --- Modify the function name from "setParameters" to "getParameters"
   fid = open(os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT, 'get_parameters_training.py'), 'rt')
   data = fid.read()
-  data = data.replace('getParameters()', 'getParameters()')
+  data = data.replace('setParameters()', 'getParameters()')
   fid.close()
   fid = open(os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT, 'get_parameters_training.py'),
              'wt')

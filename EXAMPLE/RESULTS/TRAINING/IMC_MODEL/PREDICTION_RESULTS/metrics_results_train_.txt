@@ -1,0 +1,5 @@
+Loss on test set: 0.30620744824409485
+DICE on test set: 0.8526344299316406
+DICE (binary image) test set: 0.8798103558853693, std: 0.06991472326573822
+Hausdorff distance in mm on test set: 0.17821889698039886, std: 0.18146291300789463
+IOU on test set: 0.753460168838501
