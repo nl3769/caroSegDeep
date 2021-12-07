@@ -9,13 +9,13 @@ import os
 import argparse
 import importlib
 
-from classes.sequence import sequenceClass
+from classes.sequence import sequenceClassIMC
 
 
 def save_seg(p, seq, patient):
     ''' Save segmentation results in .txt format. '''
-    LI_ = open(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'SEGMENTATION_RES', patient.split('.')[0] + "-LI.txt"), "w+")
-    MA_ = open(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'SEGMENTATION_RES', patient.split('.')[0] + "-MA.txt"), "w+")
+    LI_ = open(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'IMC_RES', patient.split('.')[0] + "-LI.txt"), "w+")
+    MA_ = open(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'IMC_RES', patient.split('.')[0] + "-MA.txt"), "w+")
     for k in range(seq.annotationClass.borders['leftBorder'], seq.annotationClass.borders['rightBorder'] + 1, 1):
         LI_.write(str(k) + " " + str(seq.annotationClass.map_annotation[1, k, 0] / seq.scale) + "\n")
         MA_.write(str(k) + " " + str(seq.annotationClass.map_annotation[1, k, 1] / seq.scale) + "\n")
@@ -35,7 +35,7 @@ def save_image(p, seq, patient):
         img[round(seq.annotationClass.map_annotation[1, k, 1] / seq.scale), k, 1] = 0
         img[round(seq.annotationClass.map_annotation[1, k, 1] / seq.scale), k, 2] = 0
 
-    plt.imsave(os.path.join(p.PATH_WALL_SEGMENTATION_RES, "IMAGES", patient.split('.')[0] + ".png"), img.astype(np.uint8))
+    plt.imsave(os.path.join(p.PATH_WALL_SEGMENTATION_RES, "IMAGES_IMC", patient.split('.')[0] + ".png"), img.astype(np.uint8))
 
 if __name__ == '__main__':
     # --- using a parser with set_parameters.py allows us to run several process with different set_parameters.py with the cluster
@@ -55,7 +55,7 @@ if __name__ == '__main__':
         path_seq = os.path.join(p.PATH_TO_SEQUENCES, patientName)
         path_borders = os.path.join(p.PATH_TO_BORDERS, patientName.split('.')[0] + "_borders.mat")
         # --- create the object sequenceClass
-        seq = sequenceClass(sequence_path =path_seq, patient_name=patientName, p=p)
+        seq = sequenceClassIMC(sequence_path =path_seq, path_borders=path_borders, patient_name=patientName, p=p)
         # --- launch the segmentation
         seq.sliding_window_vertical_scan()
         # --- save segmentation results

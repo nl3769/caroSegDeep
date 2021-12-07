@@ -14,7 +14,7 @@ from classes.sequence import sequenceClassFW
 
 def save_seg(p, seq, patient):
     ''' Save segmentation results in .txt format. '''
-    FW_ = open(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'FAR_WALL_DETECTION', patient.split('.')[0] + "-LI.txt"), "w+")
+    FW_ = open(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'FAR_WALL_DETECTION', patient.split('.')[0] + ".txt"), "w+")
     for k in range(seq.annotationClass.borders_ROI['leftBorder'], seq.annotationClass.borders_ROI['rightBorder'] + 1, 1):
         FW_.write(str(k) + " " + str(seq.annotationClass.map_annotation[0   , k, 0] / seq.scale) + "\n")
     FW_.close()

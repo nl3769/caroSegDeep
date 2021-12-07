@@ -8,22 +8,52 @@ from functions.get_biggest_connected_region import get_biggest_connected_region
 from numba import jit
 import numpy as np
 import scipy.io
+import os
 
-class annotationClass():
+# ----------------------------------------------------------------------------------------------------------------------
+def load_borders(borders_path):
+    ''' Load the right and left border from expert annoation instead to use GUI. '''
+    mat_b = scipy.io.loadmat(borders_path)
+    right_b = mat_b['border_right']
+    right_b = right_b[0, 0] - 1
+    left_b = mat_b['border_left']
+    left_b = left_b[0, 0] - 1
+
+    # --- we increase the size of the boarders if they are not large enough (128 is the width of the patch)
+    if right_b-left_b<128:
+        k=round((right_b-left_b)/2)+1
+        right_b=right_b+k
+        left_b=left_b-k
+
+    return {"leftBorder": left_b,
+            "rightBorder": right_b}
+# ----------------------------------------------------------------------------------------------------------------------
+def load_FW_prediction(path: str):
+    ''' Load the far wall prediction. '''
+    predN = open(path, "r")
+    prediction = predN.readlines()
+    predN.close()
+    pred = np.zeros(len(prediction))
+    for k in range(len(prediction)):
+        pred[k] = prediction[k].split('\n')[0].split(' ')[-1]
+
+    return pred
+# ----------------------------------------------------------------------------------------------------------------------
+class annotationClassIMC():
 
     ''' annotationClass contains functions to:
         - update annotations
         - initialize the annotation maps
         - compute the intima-media thickness '''
 
-    def __init__(self, dimension: tuple, first_frame: np.ndarray, scale: float, overlay: int, patient_name: str):
+    def __init__(self, dimension: tuple, first_frame: np.ndarray, scale: float, overlay: int, patient_name: str, p=None):
 
         self.map_annotation = np.zeros((dimension[0] + 1, dimension[2], 2))
         self.patient = patient_name
         self.overlay = overlay
         self.seq_dimension = dimension
         self.borders_ROI = {}
-        pos, _, borders_seg, borders_ROI = self.get_far_wall(first_frame)
+        pos, _, borders_seg, borders_ROI = self.get_far_wall(img=first_frame, patient_name=patient_name, p=p)
         self.borders = {"leftBorder": borders_seg[0], "rightBorder": borders_seg[1]}
         self.borders_ROI = {"leftBorder": borders_ROI[0], "rightBorder": borders_ROI[1]}
         self.initialization(localization=pos, scale=scale)
@@ -38,8 +68,8 @@ class annotationClass():
         IFC3 = np.zeros(self.seq_dimension[2])
         IFC4 = np.zeros(self.seq_dimension[2])
 
-        IFC3[self.borders_ROI['leftBorder']:self.borders_ROI['rightBorder']] = localization*scale
-        IFC4[self.borders_ROI['leftBorder']:self.borders_ROI['rightBorder']] = localization*scale
+        IFC3[self.borders_ROI['leftBorder']:self.borders_ROI['rightBorder']+1] = localization*scale
+        IFC4[self.borders_ROI['leftBorder']:self.borders_ROI['rightBorder']+1] = localization*scale
 
         self.map_annotation[0, :, 0] = IFC3
         self.map_annotation[0, :, 1] = IFC4
@@ -71,16 +101,23 @@ class annotationClass():
 
         return previous_mask
     # ------------------------------------------------------------------------------------------------------------------
-    def get_far_wall(self, img: np.ndarray):
-        """ GUI with openCV with spline interpolation to localize the far wall. """
-        image = np.zeros(img.shape + (3,))
-        image[:, :, 0] = img.copy()
-        image[:, :, 1] = img.copy()
-        image[:, :, 2] = img.copy()
+    def get_far_wall(self, img: np.ndarray, patient_name: str, p):
 
-        coordinateStore = cv2Annotation("Far wall manual detection", image.astype(np.uint8))
-
-        return coordinateStore.getpt()
+        if p.USED_FAR_WALL_DETECTION_FOR_IMC:
+            path_borders=os.path.join(p.PATH_TO_BORDERS, patient_name.split('.')[0] + "_borders.mat")
+            borders=load_borders(path_borders)
+            path_FW_pred=os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'FAR_WALL_DETECTION', patient_name.split('.')[0] + "-LI.txt")
+            FW_pred=load_FW_prediction(path_FW_pred)
+            borders_ROI=[borders['leftBorder'], borders['rightBorder']]
+            return FW_pred, '', borders_ROI, borders_ROI
+        else:
+            """ GUI with openCV with spline interpolation to localize the far wall. """
+            image = np.zeros(img.shape + (3,))
+            image[:, :, 0] = img.copy()
+            image[:, :, 1] = img.copy()
+            image[:, :, 2] = img.copy()
+            coordinateStore = cv2Annotation("Far wall manual detection", image.astype(np.uint8))
+            return coordinateStore.getpt()
     # ------------------------------------------------------------------------------------------------------------------
     def IMT(self):
         ''' Compute the IMT. '''
@@ -221,41 +258,20 @@ class annotationClassFW():
         self.map_annotation = np.zeros((dimension[0] + 1, dimension[2], 2))
         self.overlay = overlay
         self.seq_dimension = dimension
-        self.borders_ROI = self.load_borders(borders_path=borders_path)
+        self.borders_ROI = load_borders(borders_path=borders_path)
 
-    # ------------------------------------------------------------------------------------------------------------------
-    def load_borders(self, borders_path):
-        ''' Load the right and left border from expert annoation instead to use GUI. '''
-        mat_b = scipy.io.loadmat(borders_path)
-        right_b = mat_b['border_right']
-        right_b = right_b[0, 0] - 1
-        left_b = mat_b['border_left']
-        left_b = left_b[0, 0] - 1
-
-        # --- we increase the size of the boarders if they are not large enough (128 is the width of the patch)
-        if right_b-left_b<128:
-            k=round((right_b-left_b)/2)+1
-            right_b=right_b+k
-            left_b=left_b-k
-
-        return {"leftBorder": left_b,
-                "rightBorder": right_b}
     # ------------------------------------------------------------------------------------------------------------------
     def FW_auto_initialization(self, img, seed):
-
+        ''' Retreive the approximate position of the far wall. '''
         # --- window of +/- neighbours pixels where the algorithm search the borders
         neighours = 10
-
         # --- the algorithm starts from the left to the right
         x_start = self.borders_ROI['leftBorder']
         x_end = self.borders_ROI['rightBorder']
-
         # --- dimension of the mask
         dim = img.shape
-
         # --- random value to j but not to high. It the first y coordinate at the x_start position
         j = 5
-
         # --- j cannot exceed limit
         limit = dim[0] - 1
         # --- delimitation of the LI boundary
@@ -276,17 +292,14 @@ class annotationClassFW():
                     condition = False
 
                 j += 1
-
             # --- we initialize the new neighbours windows as well as the new limit value (+1 to compensate j+=1)
             j -= neighours + 1
             limit = j + 2 * neighours
-
         j = 5
         for i in range(seed[1], x_start - 1, -1):
             # --- if condition while a boundary is found
             condition = True
             while condition == True:
-
                 # --- the boundary is found, while we change the column
                 if (j < dim[0] and img[j, i] == 1):
                     self.map_annotation[0, i, 0] = j
@@ -297,9 +310,7 @@ class annotationClassFW():
                     self.map_annotation[0, i, 0] = self.map_annotation[0, i - 1, 0]
                     self.map_annotation[0, i, 1] = self.map_annotation[0, i - 1, 1]
                     condition = False
-
                 j += 1
-
             # --- we initialize the new neighbours windows as well as the new limit value (+1 to compensate j+=1)
             j -= neighours + 1
             limit = j + 2 * neighours

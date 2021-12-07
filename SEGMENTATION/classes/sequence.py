@@ -9,13 +9,13 @@ import matplotlib.pyplot as plt
 import time
 import cv2
 from classes.prediction import predictionClassIMC, predictionClassFW
-from classes.annotation import annotationClass, annotationClassFW
+from classes.annotation import annotationClassIMC, annotationClassFW
 from functions.load_datas import load_data
 from functions.get_biggest_connected_region import get_biggest_connected_region
 
-class sequenceClass():
+class sequenceClassIMC():
     ''' sequenceClass calls all the other classes to perform the calculations. This class contains all the results and runs the sliding window (sliding_window_vertical_scan). '''
-    def __init__(self, sequence_path: str, patient_name: str, p):
+    def __init__(self, sequence_path: str, path_borders: str, patient_name: str, p):
 
         self.desired_spatial_res = p.DESIRED_SPATIAL_RESOLUTION
         self.full_seq = p.PROCESS_FULL_SEQUENCE
@@ -23,11 +23,12 @@ class sequenceClass():
         self.patch_width = p.PATCH_WIDTH
         self.overlay = p.OVERLAPPING
         self.sequence, self.scale, self.spacing, self.firstFrame = load_data(sequence=sequence_path, spatial_res=self.desired_spatial_res, full_seq =self.full_seq, p=p)    # we load the sequence
-        self.annotationClass = annotationClass(dimension=self.sequence.shape,
-                                               first_frame=self.firstFrame,
-                                               scale=self.scale,
-                                               patient_name=patient_name,
-                                               overlay=self.overlay)
+        self.annotationClass = annotationClassIMC(dimension=self.sequence.shape,
+                                                  first_frame=self.firstFrame,
+                                                  scale=self.scale,
+                                                  patient_name=patient_name,
+                                                  overlay=self.overlay,
+                                                  p=p)
         self.predictionClass = predictionClassIMC(self.sequence.shape,
                                                   self.patch_height,
                                                   self.patch_width,
@@ -263,12 +264,10 @@ class sequenceClassFW():
         # --- we count the number of white pixels to localize the seed
         white_pixels = np.array(np.where(img == 1))
         seed = (round(np.mean(white_pixels[0,])), round(np.mean(white_pixels[1,])))
-        self.annotationClass.FW_auto_initialization(img=img,
-                                                    seed=seed)
-        coef = self.first_frame.shape[0] / p.PATCH_HEIGHT
-        # --- DEBUG
+        self.annotationClass.FW_auto_initialization(img=img, seed=seed)
+        coef = self.first_frame.shape[0]/p.PATCH_HEIGHT
         seg = self.annotationClass.map_annotation
-        seg = seg[0, :, :] * coef
+        seg = seg[0, :, :]*coef
         borders = self.annotationClass.borders_ROI
         x = np.linspace(borders['leftBorder'], borders['rightBorder'],
                         borders['rightBorder'] - borders['leftBorder'] + 1)
