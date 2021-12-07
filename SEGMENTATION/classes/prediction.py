@@ -6,12 +6,11 @@
 import cv2
 import numpy as np
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import *
 from caroSegDeepBuildModel.KerasSegmentationFunctions.models.custom_dilated_unet import custom_dilated_unet
 
-class predictionClass():
+class predictionClassIMC():
 
     ''' The prediction class contains the trained architecture and performs the following calculations:
     - prediction of masks
@@ -93,4 +92,88 @@ class predictionClass():
                 max = 0.1
             tmp = tmp*255/max
             patches[k,] = tmp
+        return patches
+
+class predictionClassFW():
+
+    def __init__(self, dimensions, p, img = None):
+
+        self.map_prediction = np.zeros((p.PATCH_HEIGHT, dimensions[2]), dtype=np.float32)
+        self.map_overlay = np.zeros((p.PATCH_HEIGHT, dimensions[2]), dtype=np.float32)
+        self.patch_height = p.PATCH_HEIGHT
+        self.patch_width = p.PATCH_WIDTH
+        self.patches = []
+        self.img = img
+        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, (p.MODEL_NAME+'_far_wall.h5')))
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def prediction_masks(self):
+
+        """ In this function we first retreive the pacthes. Then the preprocessed is applied, and the method self.buildMaps is called. """
+
+        patchImg = []
+
+        for i in range(len(self.patches)):
+            patchImg.append(self.patches[i]["patch"])
+
+        patches = np.asarray(patchImg)
+        patches = self.patch_preprocessing(patches=patches)
+        patches = patches[:,:][...,None]
+
+        masks = self.model.predict(patches, batch_size=1, verbose=1)
+
+        self.buildMaps(prediction=masks)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def buildMaps(self,
+                  prediction):
+
+        img = np.zeros(self.img.shape + (3,))
+        img[..., 0], img[..., 1], img[..., 2] = self.img.copy(), self.img.copy(), self.img.copy()
+
+        for i in range(len(self.patches)):
+            data_ = self.patches[i]
+            pos_ = data_["(x)"]
+            self.map_prediction[:, pos_:pos_+self.patch_width] = self.map_prediction[:, pos_:pos_+self.patch_width] + prediction[i, :, :, 0]
+            self.map_overlay[:, pos_:pos_+self.patch_width] = self.map_overlay[:, pos_:pos_+self.patch_width] + np.ones((self.patch_height, self.patch_width))
+
+
+        # --- Apply this step at the end
+        overlay_ = self.map_overlay.copy()
+        prediction_ = self.map_prediction.copy()
+
+        overlay_[overlay_ == 0] = 1
+        prediction_ = prediction_/overlay_
+
+        self.map_overlay = overlay_
+        self.map_prediction = prediction_
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def load_model(self, modelName):
+        ''' Load the model. '''
+        model = custom_dilated_unet(input_shape=(512, 128, 1),
+                                    mode='cascade',
+                                    filters=32,
+                                    kernel_size=(3, 3),
+                                    n_block=3,
+                                    n_pool_col=2,
+                                    n_class=1,
+                                    output_activation='sigmoid',
+                                    SE=None,
+                                    kernel_regularizer=None,
+                                    dropout=0.2)
+        model.load_weights(modelName)
+        return model
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def patch_preprocessing(self, patches):
+        ''' Patch preprocessing, spread grayscale value between 0 and 255. '''
+        for k in range(patches.shape[0]):
+            tmp = patches[k,]
+            min = tmp.min()
+            tmp = tmp - min
+            max = tmp.max()
+            tmp = tmp*255/max
+            patches[k,] = tmp
+
         return patches

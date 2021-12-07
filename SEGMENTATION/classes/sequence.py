@@ -7,10 +7,11 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-
-from classes.prediction import predictionClass
-from classes.annotation import annotationClass
+import cv2
+from classes.prediction import predictionClassIMC, predictionClassFW
+from classes.annotation import annotationClass, annotationClassFW
 from functions.load_datas import load_data
+from functions.get_biggest_connected_region import get_biggest_connected_region
 
 class sequenceClass():
     ''' sequenceClass calls all the other classes to perform the calculations. This class contains all the results and runs the sliding window (sliding_window_vertical_scan). '''
@@ -27,12 +28,12 @@ class sequenceClass():
                                                scale=self.scale,
                                                patient_name=patient_name,
                                                overlay=self.overlay)
-        self.predictionClass = predictionClass(self.sequence.shape,
-                                               self.patch_height,
-                                               self.patch_width,
-                                               self.annotationClass.borders_ROI,
-                                               p = p,
-                                               img=self.sequence[0,])
+        self.predictionClass = predictionClassIMC(self.sequence.shape,
+                                                  self.patch_height,
+                                                  self.patch_width,
+                                                  self.annotationClass.borders_ROI,
+                                                  p = p,
+                                                  img=self.sequence[0,])
         self.patch = np.empty((self.patch_width, self.patch_height), dtype=np.float32)
         self.step = 0
         self.current_frame = 0
@@ -167,3 +168,115 @@ class sequenceClass():
         plt.close()
 
         return IMTMeanValue, IMTMedianValue
+
+class sequenceClassFW():
+
+    def __init__(self,
+                 sequence_path: str,
+                 path_borders: str,
+                 patient_name: str,
+                 p):
+
+        self.desired_y_spacing = p.DESIRED_SPATIAL_RESOLUTION
+        self.full_seq = p.PROCESS_FULL_SEQUENCE
+        self.patch_height = p.PATCH_HEIGHT
+        self.patch_width = p.PATCH_WIDTH
+        self.overlay = p.OVERLAPPING
+        self.sequence, self.scale, self.spacing, self.first_frame = load_data(sequence=sequence_path,
+                                                                              spatial_res=self.desired_y_spacing,
+                                                                              full_seq=self.full_seq,
+                                                                              p=p)
+        self.annotationClass = annotationClassFW(dimension=self.sequence.shape,
+                                                 borders_path=path_borders,
+                                                 first_frame=self.first_frame,
+                                                 scale=self.scale,
+                                                 overlay=p.OVERLAPPING,
+                                                 patient_name=patient_name,
+                                                 p=p)
+
+        self.predictionClassFW = predictionClassFW(dimensions=self.sequence.shape,
+                                                   p=p,
+                                                   img=cv2.resize(self.first_frame.astype(np.float32), (self.first_frame.shape[1], 512), interpolation=cv2.INTER_LINEAR))
+        self.step = 0
+        self.current_frame = 0
+        self.patch = np.empty((self.patch_width, self.patch_height), dtype=np.float32)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def launch_seg_far_wall(self, p):
+
+        img_tmp = self.first_frame.copy()
+        dim = img_tmp.shape
+        # --- we first reshape the image to match with the network
+        img_tmp = cv2.resize(img_tmp.astype(np.float32), (dim[1], 512), interpolation=cv2.INTER_LINEAR)
+
+        # ---  condition give the information if the segmentation of a frame is over
+        condition = True
+
+        # --- we initialize these variables at the beginning of the image
+        self.current_frame = 0
+        self.predictionClassFW.patches = []
+        self.step = 0
+
+        while (condition == True):
+
+            # --- initialization step
+            if (self.step == 0):
+                x = self.annotationClass.borders_ROI['leftBorder']
+                overlay_ = self.overlay
+
+            # --- in self.predictionClass.patches are stored the patches at different (x,y) coordinates
+            self.predictionClassFW.patches.append({"patch": self.extract_patch_FW(x, img_tmp),
+                                                   "frameID": self.current_frame,
+                                                   "Step": self.step,
+                                                   "Overlay": overlay_,
+                                                   "(x)": (x)})
+            self.step += 1
+
+            # --- if we reach exactly the last position (on the right)
+            if ((x + self.patch_width) == self.annotationClass.borders_ROI['rightBorder']):
+                condition = False
+            # --- we move the patch from the left to the right with the defined overlay
+            elif (x + self.overlay + self.patch_width) < (self.annotationClass.borders_ROI['rightBorder']):
+                x += self.overlay
+                overlay_ = self.overlay
+
+            # --- we adjust the last patch to reach the right border
+            else:
+                tmp = x + self.patch_width - self.annotationClass.borders_ROI['rightBorder']
+                x -= tmp
+                overlay_ = tmp
+
+        # --- we segment the region under the far wall
+        self.predictionClassFW.prediction_masks()
+        self.get_far_wall(self.predictionClassFW.map_prediction, p)
+    # ------------------------------------------------------------------------------------------------------------------
+    def extract_patch_FW(self, x, img):
+        """ We extract the patch from the first frame of the sequence. """
+        return img[:, x:(x + self.patch_width)]
+    # ------------------------------------------------------------------------------------------------------------------
+    def get_far_wall(self, img, p):
+        ''' Get far wall. '''
+        # --- we get the bigest connexe region
+        img[img>0.5]=1
+        img[img<1]=0
+        img = get_biggest_connected_region(img)
+        # --- we count the number of white pixels to localize the seed
+        white_pixels = np.array(np.where(img == 1))
+        seed = (round(np.mean(white_pixels[0,])), round(np.mean(white_pixels[1,])))
+        self.annotationClass.FW_auto_initialization(img=img,
+                                                    seed=seed)
+        coef = self.first_frame.shape[0] / p.PATCH_HEIGHT
+        # --- DEBUG
+        seg = self.annotationClass.map_annotation
+        seg = seg[0, :, :] * coef
+        borders = self.annotationClass.borders_ROI
+        x = np.linspace(borders['leftBorder'], borders['rightBorder'],
+                        borders['rightBorder'] - borders['leftBorder'] + 1)
+        regr = np.poly1d(np.polyfit(x, seg[borders['leftBorder']:borders['rightBorder'] + 1, 0], 3))
+        tmp = regr(x)
+        tmp[tmp < 0] = 0
+        tmp[tmp >= self.first_frame.shape[0]] = self.first_frame.shape[0] - 1
+        seg[borders['leftBorder']:borders['rightBorder'] + 1, 0], seg[borders['leftBorder']:borders['rightBorder'] + 1, 1] = tmp, tmp
+
+        self.annotationClass.map_annotation[0, :, ] = seg * self.scale
+    # ------------------------------------------------------------------------------------------------------------------

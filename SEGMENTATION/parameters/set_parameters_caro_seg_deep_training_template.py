@@ -33,17 +33,17 @@ def setParameters():
     MODEL_SELECTION='custom_dilated_unet',        # The name of the desired architecture
     LEARNING_RATE=0.001,                          # The starting value of the learning rate
     LOSS='dice_bce_loss',                         # The desired loss function
-    PATH_TO_SAVE_PREDICTION_DURING_TRAINING='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/TRAINING', # An image is predicted at the end of an epoch during training, and will be saved in the specified path.
+    PATH_TO_SAVE_PREDICTION_DURING_TRAINING='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/TRAINING/IMC_MODEL/', # An image is predicted at the end of an epoch during training, and will be saved in the specified path.
     PATCH_HEIGHT=512,  # The height of a patch
     PATCH_WIDTH=128,  # The width of a patch
 
     # --- relative to results
-    PATH_TO_SAVE_TENSORBOARD='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/TRAINING/TENSORBOARD/',                           # path to save tensorboard
-    PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/TRAINING/PREDICTION_RESULTS/',    # where metrics/pdf are saved
-    NAME_OF_THE_EXPERIMENT='EXAMPLE', # name of the experiment will appear in the directories where the results are stored. !!!!!!!!! FOLD !!!!!!!!!
+    PATH_TO_SAVE_TENSORBOARD='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/TRAINING/IMC_MODEL/TENSORBOARD/',                           # path to save tensorboard
+    PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/TRAINING/IMC_MODEL/PREDICTION_RESULTS/',    # where metrics/pdf are saved
+    NAME_OF_THE_EXPERIMENT='TEST', # name of the experiment will appear in the directories where the results are stored. !!!!!!!!! FOLD !!!!!!!!!
 
     # --- relative to data
-    PATH_TO_DATASET='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/DATASET/CUBS.h5', # Path where dataset in .h5 is saved
+    PATH_TO_DATASET='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/DATASET/CUBS_wall.h5', # Path where dataset in .h5 is saved
     )
 
   # --- Print all attributes in the console

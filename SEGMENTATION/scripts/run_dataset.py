@@ -26,8 +26,8 @@ if __name__ == "__main__":
     ############################################################
 
     # --- we create the datasetBuilderWall object to create the dataset used to train a IMC segmentation model
-    dataSetWall = datasetBuilderWall(p=p)
+    # dataSetWall = datasetBuilderWall(p=p)
     # --- we create the dataset
-    dataSetWall.build_data()
+    # dataSetWall.build_data()
 
 

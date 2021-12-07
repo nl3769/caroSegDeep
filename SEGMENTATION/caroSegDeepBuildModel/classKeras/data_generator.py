@@ -43,18 +43,11 @@ class dataGenerator(tensorflow.keras.utils.Sequence):
         return x, y
     # ----------------------------------------------------------------
     def __len__(self):
-        '''
-        Denotes the number of batches per epoch
-
-        Returns:
-            number of batch per epoch (int)
-        '''
-
+        ''' Denotes the number of batches per epoch. '''
         return int(np.ceil(len(self.keys) / self.batch_size))
     # ----------------------------------------------------------------
     def __getitem__(self, index):
         ''' Generate one batch of data with augmentation. '''
-
         # --- Generate indexes of the batch
         indexes = self.keys[index * self.batch_size:(index + 1) * self.batch_size]
 
@@ -69,9 +62,7 @@ class dataGenerator(tensorflow.keras.utils.Sequence):
             np.random.shuffle(self.keys)
     # ----------------------------------------------------------------
     def __data_generation(self, list_IDs_temp):
-
         ''' Returns data batch (with augmentation or not).'''
-
         # --- Initialization
         X = np.empty((len(list_IDs_temp), *self.dim), dtype=np.float32)
         y = np.empty((len(list_IDs_temp), *self.dim), dtype=np.int8)
