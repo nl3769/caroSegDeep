@@ -68,8 +68,8 @@ class annotationClassIMC():
         IFC3 = np.zeros(self.seq_dimension[2])
         IFC4 = np.zeros(self.seq_dimension[2])
 
-        IFC3[self.borders_ROI['leftBorder']:self.borders_ROI['rightBorder']+1] = localization*scale
-        IFC4[self.borders_ROI['leftBorder']:self.borders_ROI['rightBorder']+1] = localization*scale
+        IFC3[self.borders_ROI['leftBorder']:self.borders_ROI['rightBorder']] = localization*scale
+        IFC4[self.borders_ROI['leftBorder']:self.borders_ROI['rightBorder']] = localization*scale
 
         self.map_annotation[0, :, 0] = IFC3
         self.map_annotation[0, :, 1] = IFC4
@@ -103,12 +103,21 @@ class annotationClassIMC():
     # ------------------------------------------------------------------------------------------------------------------
     def get_far_wall(self, img: np.ndarray, patient_name: str, p):
 
-        if p.USED_FAR_WALL_DETECTION_FOR_IMC:
+        # --- check if the far wall of the current patient had been predicted
+        prediction_=os.listdir(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'FAR_WALL_DETECTION'))
+        name_ = patient_name.split('.')[0]+'.txt'
+
+        # --- if the far wall was not predicted it is done manually
+        if p.USED_FAR_WALL_DETECTION_FOR_IMC and (name_ in prediction_):
             path_borders=os.path.join(p.PATH_TO_BORDERS, patient_name.split('.')[0] + "_borders.mat")
             borders=load_borders(path_borders)
-            path_FW_pred=os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'FAR_WALL_DETECTION', patient_name.split('.')[0] + "-LI.txt")
+            path_FW_pred=os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'FAR_WALL_DETECTION', patient_name.split('.')[0] + ".txt")
             FW_pred=load_FW_prediction(path_FW_pred)
             borders_ROI=[borders['leftBorder'], borders['rightBorder']]
+
+            # --- remove the last value to fit with other functions
+            FW_pred=FW_pred[:-1]
+
             return FW_pred, '', borders_ROI, borders_ROI
         else:
             """ GUI with openCV with spline interpolation to localize the far wall. """

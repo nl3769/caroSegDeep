@@ -11,7 +11,6 @@ import importlib
 
 from classes.sequence import sequenceClassFW
 
-
 def save_seg(p, seq, patient):
     ''' Save segmentation results in .txt format. '''
     FW_ = open(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'FAR_WALL_DETECTION', patient.split('.')[0] + ".txt"), "w+")

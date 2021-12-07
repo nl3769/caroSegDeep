@@ -20,7 +20,7 @@ def setParameters():
 
                 PATH_TO_SEQUENCES='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/IMAGES',                             # Path where the sequences/images are saved (.tiff, .DICOM, .MAT)
                 PATH_TO_BORDERS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/BORDERS/BORDERS_UNION',     # Path where the borders are saved (.MAT)
-                PATH_TO_CONTOURS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/CONTOURS',                            # Path where the contours are saved (.MAT, .txt)
+                PATH_TO_CONTOURS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/CONTOURS',                            # Path where the contours are saved (.MAT, .txt)
                 PATH_TO_CF='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/DATA/CF',
                 PROCESS_FULL_SEQUENCE=False,        # Segment all the frame of the sequence or only the first one
                 PATCH_HEIGHT=512,                   # The height of a patch
@@ -29,7 +29,10 @@ def setParameters():
                 DESIRED_SPATIAL_RESOLUTION=5,       # The desired spatial resolution in um
                 PATH_WALL_SEGMENTATION_RES='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/INFERENCE',         # Path to save results
                 PATH_TO_LOAD_TRAINED_MODEL_WALL='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/TRAINED_MODEL',        # Path where the trained model is saved
-                MODEL_NAME='custom_dilated_unet'
+                MODEL_NAME='custom_dilated_unet',
+                USED_FAR_WALL_DETECTION_FOR_IMC=True,                                                                   # If true then the predicted far wall is used to segment the IMC
+                PATH_TO_FOLDS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/DATASET/DISTRIBUTION',
+      # In this directory .txt files contain the patient's name according to their belonging (train/val/test)
   )
 
   # --- Print all attributes in the console

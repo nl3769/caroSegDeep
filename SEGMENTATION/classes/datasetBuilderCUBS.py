@@ -13,7 +13,7 @@ from functions.patch_extraction import patch_extraction_wall, patch_extraction_f
 from functions.split_data import split_data_fold
 
 
-def save_dic_to_HDF5(dic_datas, path: str):
+def save_dic_to_HDF5(dic_datas: dict, path: str):
     ''' Save patches in .h5 file with train/validation/test sets. '''
 
     # --- we open the file

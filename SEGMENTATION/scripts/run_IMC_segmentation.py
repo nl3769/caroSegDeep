@@ -46,10 +46,10 @@ if __name__ == '__main__':
     # --- we get parameters
     p=param.setParameters()
     # --- get image name
-    patientNameList = os.listdir(p.PATH_TO_SEQUENCES)
-    patientNameList.remove('.empty')    # .empty to add directories to git, do not remove it
+    patient_name_list = os.listdir(p.PATH_TO_SEQUENCES)
+    patient_name_list.remove('.empty')    # .empty to add directories to git, do not remove it
     # --- launch process
-    for patientName in patientNameList:
+    for patientName in patient_name_list:
         print("Current processed patient: ", patientName)
         # --- path to the data
         path_seq = os.path.join(p.PATH_TO_SEQUENCES, patientName)
