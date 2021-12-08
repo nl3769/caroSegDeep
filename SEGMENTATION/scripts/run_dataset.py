@@ -3,7 +3,7 @@
 @Contact :   <nolann.laine@outlook.fr>
 '''
 
-from classes.datasetBuilderCUBS import datasetBuilderWall, datasetBuilderFarWall
+from classes.datasetBuilderCUBS import datasetBuilderIMC, datasetBuilderFarWall
 import argparse
 import importlib
 
@@ -26,8 +26,8 @@ if __name__ == "__main__":
     ############################################################
 
     # --- we create the datasetBuilderWall object to create the dataset used to train a IMC segmentation model
-    dataSetWall = datasetBuilderWall(p=p)
+    dataSetIMC = datasetBuilderIMC(p=p)
     # --- we create the dataset
-    dataSetWall.build_data()
+    dataSetIMC.build_data()
 
 

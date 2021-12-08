@@ -44,7 +44,7 @@ def save_dic_to_HDF5(dic_datas: dict, path: str):
     # --- we close the file
     f.close()
 
-class datasetBuilderWall():
+class datasetBuilderIMC():
     def __init__(self, p):
         ''' Computes dataset according to CUBS database. '''
         self.window = p.PATCH_WIDTH
