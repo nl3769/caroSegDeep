@@ -67,7 +67,7 @@ def test(p, set):
 # ----------------------------------------------------------------------------------------------------------------------
 def write_metrics(loss_value: float, iou_value: float, dice_coef_val: float, dice_coef_thresholded: float, hausforff: float, path: str, set: str):
     # --- open file
-    file = open(os.path.join(path, "metrics_results_" + set + "_.txt"), "w")
+    file = open(os.path.join(path, "metrics_results_" + set + ".txt"), "w")
     # --- xrite metrics
     file.write("Loss on test set: " + str(loss_value) + "\n")
     file.write("DICE on test set: " + str(dice_coef_val) + "\n")
