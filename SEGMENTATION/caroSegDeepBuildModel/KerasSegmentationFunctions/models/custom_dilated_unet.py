@@ -1,12 +1,15 @@
 # from tensorflow.keras.layers import Conv2D, MaxPooling2D, UpSampling2D, BatchNormalization, GlobalAveragePooling, Dropout
 # from tensorflow.keras.layers import Input, add, concatenate, Dense
 import tensorflow
+
 from tensorflow.keras import regularizers
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import RMSprop
 import numpy as np
 
+physical_devices = tensorflow.config.experimental.list_physical_devices('GPU')
+tensorflow.config.experimental.set_memory_growth(physical_devices[0], True)
 # --------------------------------------------------------
 def squeeze_excitation(input, r):
     size_conv = input.shape  # 5 features maps (50*50)

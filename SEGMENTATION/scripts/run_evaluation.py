@@ -3,7 +3,7 @@ import os
 import numpy as np
 import argparse
 import importlib
-from classes.evaluation import evaluationClassIMC
+from classes.evaluation import evaluationClassIMC, evaluationClassFW
 
 if __name__ == '__main__':
     # -- using a parser with set_parameters.py allows us to run several process with different set_parameters.py with the cluster
@@ -13,6 +13,11 @@ if __name__ == '__main__':
     param = importlib.import_module('parameters.' + arg['Parameters'].split('.')[0])
     p = param.setParameters()
 
-    evaluation=evaluationClassIMC(p)
-    evaluation.compute_MAE()
-    evaluation.compute_DICE()
+    # --- far wall evaluation (outliers' detection)
+    evaluationFW=evaluationClassFW(p)
+    evaluationFW.compute_MAE_FW()
+
+    # --- Intima media complexe evaluation
+    evaluationIMC=evaluationClassIMC(p)
+    evaluationIMC.compute_MAE()
+    evaluationIMC.compute_DICE()

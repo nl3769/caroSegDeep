@@ -18,7 +18,7 @@ def get_narrow_borders(borders_expert, borders_pred):
     return borders_roi
 
 class evaluationClassIMC():
-    ''' evaluationClass contains the code for evaluation. Nowaday, only mean absolute error is computed.  '''
+    ''' evaluationClassIMC contains the code for IMC, mean absolute error and DICE are computed.  '''
     def __init__(self, p):
         self.p=p
     # ------------------------------------------------------------------------------------------------------------------
@@ -26,9 +26,9 @@ class evaluationClassIMC():
         ''' Compute the mean absolute error for all patient in the dataset and spread them in train/validation/test. '''
         # --- get predicted patient
         path_to_prediction = os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, "IMC_RES")
-        predictedPatients = os.listdir(path_to_prediction)
-        for k in range(len(predictedPatients)):
-            predictedPatients[k] = predictedPatients[k].split('-')[0]
+        predicted_patients = os.listdir(path_to_prediction)
+        for k in range(len(predicted_patients)):
+            predicted_patients[k] = predicted_patients[k].split('-')[0]
         # --- we read the sets (train/val/test)
         val_patient = read_fold(os.path.join(self.p.PATH_TO_FOLDS, "ValList.txt"))
         test_patient = read_fold(os.path.join(self.p.PATH_TO_FOLDS, "TestList.txt"))
@@ -47,8 +47,7 @@ class evaluationClassIMC():
         for set in sets:
             inc = 0
             for patient in patients[set]:
-
-                if patient in predictedPatients:
+                if patient in predicted_patients:
                     # --- we get the annotation
                     IFC3_A1, IFC4_A1 = load_annotation(path=self.p.PATH_TO_CONTOURS, patient=patient, expert_name='A1')
                     IFC3_pred, IFC4_pred, borders_pred = load_prediction_IMC(patient, path_to_prediction,
@@ -72,35 +71,35 @@ class evaluationClassIMC():
                     inc += 1
 
             # --- save results
-            results = open(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', set + "_MAE.txt"), "w+")
-            results.write("LI_MAE (mean): " + str(np.mean(LI_MAE)) + " um\n")
-            results.write("LI_MAE (std): " + str(np.std(LI_MAE)) + " um\n\n\n")
-            results.write("MA_MAE (mean): " + str(np.mean(MA_MAE)) + " um\n")
-            results.write("MA_MAE (std): " + str(np.std(MA_MAE)) + " um\n\n\n")
-            results.write("IMT_MAE (mean): " + str(np.mean(IMT_MAE)) + " um\n")
-            results.write("IMT_MAE (std): " + str(np.std(IMT_MAE)) + " um\n\n\n")
+            results = open(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION','IMC_' + set + '_MAE.txt'), "w+")
+            results.write("IMC LI_MAE (mean): " + str(np.mean(LI_MAE)) + " um\n")
+            results.write("IMC LI_MAE (std): " + str(np.std(LI_MAE)) + " um\n\n\n")
+            results.write("IMC MA_MAE (mean): " + str(np.mean(MA_MAE)) + " um\n")
+            results.write("IMC MA_MAE (std): " + str(np.std(MA_MAE)) + " um\n\n\n")
+            results.write("IMC IMT_MAE (mean): " + str(np.mean(IMT_MAE)) + " um\n")
+            results.write("IMC IMT_MAE (std): " + str(np.std(IMT_MAE)) + " um\n\n\n")
             results.close()
 
             LI_MAE = np.zeros(0, dtype=np.float32)
             MA_MAE = np.zeros(0, dtype=np.float32)
             IMT_MAE = np.zeros(0, dtype=np.float32)
 
-        results = open(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', "full_dataset_MAE.txt"), "w+")
-        results.write("LI_MAE (mean): " + str(np.mean(LI_MAE_F)) + " um\n")
-        results.write("LI_MAE (std): " + str(np.std(LI_MAE_F)) + " um\n\n\n")
-        results.write("MA_MAE (mean): " + str(np.mean(MA_MAE_F)) + " um\n")
-        results.write("MA_MAE (std): " + str(np.std(MA_MAE_F)) + " um\n\n\n")
-        results.write("IMT_MAE (mean): " + str(np.mean(IMT_MAE_F)) + " um\n")
-        results.write("IMT_MAE (std): " + str(np.std(IMT_MAE_F)) + " um\n\n\n")
+        results = open(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION','IMC_' +  "full_dataset_MAE.txt"), "w+")
+        results.write("IMC LI_MAE (mean): " + str(np.mean(LI_MAE_F)) + " um\n")
+        results.write("IMC LI_MAE (std): " + str(np.std(LI_MAE_F)) + " um\n\n\n")
+        results.write("IMC MA_MAE (mean): " + str(np.mean(MA_MAE_F)) + " um\n")
+        results.write("IMC MA_MAE (std): " + str(np.std(MA_MAE_F)) + " um\n\n\n")
+        results.write("IMC IMT_MAE (mean): " + str(np.mean(IMT_MAE_F)) + " um\n")
+        results.write("IMC IMT_MAE (std): " + str(np.std(IMT_MAE_F)) + " um\n\n\n")
         results.close()
     # ------------------------------------------------------------------------------------------------------------------
     def compute_DICE(self):
         ''' Compute the DICE coefficient for all patient in the dataset and spread them in train/validation/test. '''
         # --- get predicted patient
         path_to_prediction = os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, "IMC_RES")
-        predictedPatients = os.listdir(path_to_prediction)
-        for k in range(len(predictedPatients)):
-            predictedPatients[k] = predictedPatients[k].split('-')[0]
+        predicted_patients = os.listdir(path_to_prediction)
+        for k in range(len(predicted_patients)):
+            predicted_patients[k] = predicted_patients[k].split('-')[0]
         # --- we read the sets (train/val/test)
         val_patient = read_fold(os.path.join(self.p.PATH_TO_FOLDS, "ValList.txt"))
         test_patient = read_fold(os.path.join(self.p.PATH_TO_FOLDS, "TestList.txt"))
@@ -115,8 +114,7 @@ class evaluationClassIMC():
             DICE = []
             inc = 0
             for patient in patients[set]:
-
-                if patient in predictedPatients:
+                if patient in predicted_patients:
                     # --- we get the annotation
                     IFC3_A1, IFC4_A1 = load_annotation(path=self.p.PATH_TO_CONTOURS, patient=patient, expert_name='A1')
                     IFC3_pred, IFC4_pred, borders_pred = load_prediction_IMC(patient, path_to_prediction,
@@ -127,7 +125,7 @@ class evaluationClassIMC():
                     borders_expert = get_border_expert(IFC3_A1, IFC4_A1)
                     borders_ROI = get_narrow_borders(borders_pred, borders_expert)
                     # --- we compute the MAE
-                    dice_ = compute_metric_wall_DICE(patient, prediction, expert, borders_ROI, set=set, p=self.p)
+                    dice_ = compute_metric_wall_DICE(patient, prediction, expert, borders_ROI, p=self.p)
                     # --- update DICE
                     DICE.append(dice_)
                     DICE_F.append(dice_)
@@ -135,16 +133,71 @@ class evaluationClassIMC():
                     inc += 1
 
             # --- save results
-            results = open(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', set + "_DICE.txt"), "w+")
+            results = open(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', 'IMC_' + set + "_DICE.txt"), "w+")
             DICE=np.array(DICE)
-            results.write("DICE (mean): " + str(np.mean(DICE)) + "\n")
-            results.write("DICE (std): " + str(np.std(DICE)) + "\n\n\n")
+            results.write("IMC DICE (mean): " + str(np.mean(DICE)) + "\n")
+            results.write("IMC DICE (std): " + str(np.std(DICE)) + "\n\n\n")
             results.close()
 
 
-        results = open(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', "full_dataset_MAE.txt"), "w+")
+        results = open(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', 'IMC_' + "full_dataset_DICE.txt"), "w+")
         DICE_F = np.array(DICE_F)
-        results.write("DICE (mean): " + str(np.mean(DICE_F)) + "\n")
-        results.write("DICE (std): " + str(np.std(DICE_F)) + "\n\n\n")
+        results.write("IMC DICE (mean): " + str(np.mean(DICE_F)) + "\n")
+        results.write("IMC DICE (std): " + str(np.std(DICE_F)) + "\n\n\n")
 
         results.close()
+
+class evaluationClassFW():
+    ''' evaluationClassFW contains the code to sort potential initialization failures.  '''
+    def __init__(self, p):
+        self.p=p
+
+    def compute_MAE_FW(self):
+        ''' Compute the mean absolute error for all patient in the dataset and spread them in train/validation/test. '''
+        # --- get predicted patient
+        path_to_prediction = os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, "FAR_WALL_DETECTION")
+        predicted_patients = os.listdir(path_to_prediction)
+        if '.empty' in predicted_patients:
+            predicted_patients.remove('.empty') # add especially for git to create the path
+        for k in range(len(predicted_patients)):
+            predicted_patients[k] = predicted_patients[k].split('.')[0]
+        # --- we read the sets (train/val/test)
+        val_patient = read_fold(os.path.join(self.p.PATH_TO_FOLDS, "ValList.txt"))
+        test_patient = read_fold(os.path.join(self.p.PATH_TO_FOLDS, "TestList.txt"))
+        train_patient = read_fold(os.path.join(self.p.PATH_TO_FOLDS, "TrainList.txt"))
+
+        MEDIAN_MAE_set = np.zeros(0, dtype=np.float32)
+        MEDIAN_MAE_full = np.zeros(0, dtype=np.float32)
+
+        sets = ['validation', 'train', 'test']
+
+        patients = {'validation': val_patient,
+                    'train': train_patient,
+                    'test': test_patient}
+
+        for set in sets:
+            for patient in patients[set]:
+                if patient in predicted_patients:
+
+                    IFC3, IFC4 = load_annotation(path=self.p.PATH_TO_CONTOURS, patient=patient, expert_name='A1')
+
+                    borders_expert = get_border_expert(IFC3, IFC4)
+                    pred, borders_pred = load_prediction_FW(patient, os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'FAR_WALL_DETECTION'))
+                    borders_ROI = get_narrow_borders(borders_pred, borders_expert)
+
+                    mae_ = compute_metric_FW_MAE(patient, pred, IFC3=IFC3, IFC4=IFC4, borders=borders_ROI, set=set, p=self.p)
+                    MEDIAN_MAE_set = np.concatenate((MEDIAN_MAE_set, mae_))
+                    MEDIAN_MAE_full = np.concatenate((MEDIAN_MAE_full, mae_))
+
+                    results = open(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', 'FW_MAE_' + set + ".txt"), "w+")
+                    results.write("MEDIAN_MAE (mean): " + str(np.mean(MEDIAN_MAE_set)) + "\n")
+                    results.write("MEDIAN_MAE (std): " + str(np.std(MEDIAN_MAE_set)) + "\n\n\n")
+                    MEDIAN_MAE_set = np.zeros(0, dtype=np.float32)
+                    results.close()
+
+        results = open(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, "FW__full_dataset_MAE.txt"), "w+")
+        results.write("MEDIAN_MAE (mean): " + str(np.mean(MEDIAN_MAE_full)) + "\n")
+        results.write("MEDIAN_MAE (std): " + str(np.std(MEDIAN_MAE_full)) + "\n\n\n")
+    # ------------------------------------------------------------------------------------------------------------------
+
+
