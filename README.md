@@ -95,11 +95,11 @@ Two modes are proposed to segment the _IMC_ _i_) a semi-automatic method which m
   
 The script use the previous trained model named _CUBS_wall.h5_. If you do not train the model, you can download a pretrained one on the  following link: ADDLINK and copy it in **_EXAMPLE/TRAINED_MODEL_**
 
-Then modify the file _**parameters/set_parameters_training_template.py**_ in order to match with your directory and run `sh run_training.sh`.
+Then modify the file _**parameters/set_parameters_training_template.py**_ in order to match with your directory and run `bash run_training.sh`.
 
 The training results is saved in **_caroSegDeep/EXAMPLE/RESULTS/TRAINING_**
 
-To launch the segmentation, run `sh run_segmentation.sh`. The code will segment all images in the folder:
+To launch the segmentation, run `bash run_segmentation.sh`. The code will segment all images in the folder:
  _**caroSegDeep/EXAMPLE/DATA/IMAGES**_. 
 For each image, the user has to manually detect the far wall of the _CCA_. It is a homemade interface, the commands are listed below:
 * _left click:_ set a point;
