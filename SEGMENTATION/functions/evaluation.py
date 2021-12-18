@@ -89,58 +89,6 @@ def get_border_expert(IFC3, IFC4):
 
     return {'left_border': left_border, 'right_border': right_border}
 # ----------------------------------------------------------------------------------------------------------------------
-def compute_metric_wall_final(patient,
-                           IFC3_pred, IFC4_pred, IFC3_exp, IFC4_exp,
-                           left_border_r, right_border_r,
-                           left_border_exp, right_border_exp,
-                           left_border_expert, right_border_expert):
-
-    scale = read_CF_directory(os.path.join(p.PATH_TO_CF, patient + "_CF.txt"))
-
-    LI_MAE = np.abs(IFC3_exp[left_border_r:right_border_r+1]-IFC3_pred[left_border_r:right_border_r+1])*scale*1000
-    MA_MAE = np.abs(IFC4_exp[left_border_r:right_border_r+1] - IFC4_pred[left_border_r:right_border_r+1])*scale*1000
-    IMT_MAE = np.abs((IFC4_exp[left_border_r:right_border_r+1]-IFC3_exp[left_border_r:right_border_r+1])-(IFC4_pred[left_border_r:right_border_r+1]-IFC3_pred[left_border_r:right_border_r+1]))*scale*1000
-
-    ind_mean_LI_MAE = np.mean(LI_MAE)
-    ind_mean_MA_MAE = np.mean(MA_MAE)
-    ind_mean_IMT_MAE = np.mean(IMT_MAE)
-
-    tresh = 250
-
-    if ind_mean_LI_MAE > tresh or ind_mean_MA_MAE > tresh or ind_mean_IMT_MAE > tresh:
-        img = cv2.imread(os.path.join(p.PATH_TO_SEQUENCES, patient + ".tiff"))
-
-        for k in range(left_border_exp, right_border_exp+1):
-            img[round(IFC3_pred[k]), k, 0] = 0
-            img[round(IFC3_pred[k]), k, 1] = 0
-            img[round(IFC3_pred[k]), k, 2] = 255
-
-            img[round(IFC4_pred[k]), k, 0] = 0
-            img[round(IFC4_pred[k]), k, 1] = 0
-            img[round(IFC4_pred[k]), k, 2] = 255
-
-
-
-        for k in range(left_border_expert, right_border_expert + 1):
-            img[round(IFC3_exp[k]), k, 0] = 0
-            img[round(IFC3_exp[k]), k, 1] = 255
-            img[round(IFC3_exp[k]), k, 2] = 0
-
-            img[round(IFC4_exp[k]), k, 0] = 0
-            img[round(IFC4_exp[k]), k, 1] = 255
-            img[round(IFC4_exp[k]), k, 2] = 0
-
-        cv2.imwrite(os.path.join(p.PATH_TO_RES, fold, set, "IMAGES", patient + ".jpg"), img)
-
-        err = open(os.path.join(p.PATH_TO_RES, p.FOLD, set, patient + ".txt"), 'w+')
-        err.write("Lumen intima: " + str(ind_mean_LI_MAE) + "\n")
-        err.write("Media adventice: " + str(ind_mean_MA_MAE) + "\n")
-        err.write("intima media: " + str(ind_mean_IMT_MAE) + "\n")
-        err.close
-
-    return LI_MAE, MA_MAE, IMT_MAE
-
-# ----------------------------------------------------------------------------------------------------------------------
 def compute_metric_wall_MAE(patient: str, prediction: dict, expert: dict, borders_ROI: dict, set: str, p, save_outlier= False):
 
     scale = read_CF_directory(os.path.join(p.PATH_TO_CF, patient + "_CF.txt"))
@@ -197,15 +145,7 @@ def compute_metric_wall_MAE(patient: str, prediction: dict, expert: dict, border
 
     return LI_MAE, MA_MAE, IMT_MAE
 # ----------------------------------------------------------------------------------------------------------------------
-def compute_metric_wall_DICE(patient: str, prediction: dict, expert: dict, borders_ROI: dict, set: str, p, save_outlier= False):
-
-    scale = read_CF_directory(os.path.join(p.PATH_TO_CF, patient + "_CF.txt"))
-
-    IFC3_pred=prediction['IFC3']
-    IFC4_pred = prediction['IFC4']
-
-    IFC3_exp=expert['IFC3']
-    IFC4_exp = expert['IFC4']
+def compute_metric_wall_DICE(patient: str, prediction: dict, expert: dict, borders_ROI: dict, p):
 
     img = cv2.imread(os.path.join(p.PATH_TO_SEQUENCES, patient + ".tiff"))
     dim_img=img.shape[0:2]
@@ -225,3 +165,64 @@ def compute_metric_wall_DICE(patient: str, prediction: dict, expert: dict, borde
     print("DICE: ", dice)
 
     return dice
+# ----------------------------------------------------------------------------------------------------------------------
+def compute_metric_FW_MAE(patient, pred, IFC3, IFC4, borders, set, p):
+
+
+    GT = (IFC3+IFC4)/2
+    scale = read_CF_directory(os.path.join(p.PATH_TO_CF, patient + "_CF.txt"))
+    left_border=borders['left_border']
+    right_border=borders['right_border']
+
+    metric = np.abs(GT[left_border:right_border] - pred[left_border:right_border])*scale*1000
+    # --- 800um -> just a distance far enough from the mean value. If the MAE is greater than 800 then it can be an outlier
+    if metric.max() > 800:
+
+        img = cv2.imread(os.path.join(p.PATH_TO_SEQUENCES, patient + ".tiff"))
+        for k in range(left_border, right_border+1):
+
+            img[round(pred[k]), k, 0], img[round(pred[k]), k, 1], img[round(pred[k]), k, 2] = 255, 255, 255
+
+            img[round(IFC4[k]), k, 0] = 255
+            img[round(IFC4[k]), k, 1], img[round(IFC4[k]), k, 2] = 0, 0
+
+            img[round(IFC3[k]), k, 1] = 255
+            img[round(IFC3[k]), k, 2], img[round(IFC3[k]), k, 0] = 0, 0
+
+        cv2.imwrite(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', "FW_OUTLIERS", set + '_' + patient + ".jpg"), img)
+
+        # --- uncomment to save the metrics; but only the image is useful for visual inspection.
+        # err = open(os.path.join(p.PATH_TO_RES, , patient + ".txt"), 'w+')
+        # err.write("max distance by column: " + str(metric.max()) + "\n")
+        # err.write("average distance by column: " + str(metric.mean()) + "\n")
+        # err.write("std average distance by column: " + str(metric.std()) + "\n")
+        # err.close
+
+    return metric
+# ----------------------------------------------------------------------------------------------------------------------
+def load_prediction_FW(patientName: str, path: str):
+
+    predN = open(os.path.join(path, patientName + ".txt"), "r")
+    prediction = predN.readlines()
+    predN.close()
+
+    pred = np.zeros(len(prediction))
+
+    for k in range(len(prediction)):
+        pred[k] = prediction[k].split('\n')[0].split(' ')[-1]
+        if k==0:
+            left_border=int(prediction[k].split('\n')[0].split(' ')[0])
+        if k==len(prediction)-1:
+            right_border=int(prediction[k].split('\n')[0].split(' ')[0])
+    pred=np.concatenate((np.zeros(left_border), pred))
+    return pred, {'left_border': left_border, 'right_border': right_border}
+# ----------------------------------------------------------------------------------------------------------------------
+def get_narrow_borders(borders_expert, borders_pred):
+    ''' Get the intersection border. '''
+
+    left_border_r=max(borders_expert['left_border'], borders_pred['left_border'])
+    right_border_r=min(borders_expert['right_border'], borders_pred['right_border'])
+
+    borders_roi={'left_border': left_border_r,'right_border': right_border_r}
+
+    return borders_roi
