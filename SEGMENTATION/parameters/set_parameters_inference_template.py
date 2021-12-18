@@ -29,8 +29,8 @@ def setParameters():
                 DESIRED_SPATIAL_RESOLUTION=5,       # The desired spatial resolution in um
                 PATH_WALL_SEGMENTATION_RES='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/INFERENCE',         # Path to save results
                 PATH_TO_LOAD_TRAINED_MODEL_WALL='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/TRAINED_MODEL',        # Path where the trained model is saved
-                MODEL_NAME_IMC='IMC_custom_dilated_unet',
-                MODEL_NAME_FW='FW_custom_dilated_unet'
+                MODEL_NAME_IMC='IMC_custom_dilated_unet.h5',
+                MODEL_NAME_FW='FW_custom_dilated_unet.h5'
                 USED_FAR_WALL_DETECTION_FOR_IMC=True,                                                                   # If true then the predicted far wall is used to segment the IMC
                 PATH_TO_FOLDS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/DATASET/DISTRIBUTION',
       # In this directory .txt files contain the patient's name according to their belonging (train/val/test)
