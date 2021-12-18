@@ -198,6 +198,7 @@ class evaluationClassIMC():
             MAE_MA[set] = MA_MAE
             MAE_IMT[set] = IMT_MAE
 
+            # --- reset arrays
             LI_MAE = np.zeros(0, dtype=np.float32)
             MA_MAE = np.zeros(0, dtype=np.float32)
             IMT_MAE = np.zeros(0, dtype=np.float32)
@@ -226,9 +227,9 @@ class evaluationClassIMC():
         ax3.tick_params(axis='x', colors='red')
         plt.gca().xaxis.set_ticklabels(['train', 'validation', 'test'])
 
-
-        plt.show()
-
+        fig1.savefig(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', "box_plot_LI.png") , bbox_inches='tight')
+        fig2.savefig(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', "box_plot_MA.png"), bbox_inches='tight')
+        fig3.savefig(os.path.join(self.p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', "box_plot_IMT.png"), bbox_inches='tight')
 # ----------------------------------------------------------------------------------------------------------------------
 class evaluationClassFW():
     ''' evaluationClassFW contains the code to sort potential initialization failures.  '''
