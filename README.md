@@ -4,15 +4,15 @@ Arterial wall segmentation on ultrasound image sequences using deep learning.
 
 # Overview
 
-The presented GIT is a demonstration of the developed algorithm and can be used as a public a benchmark. It uses a convolutional neural network (_CNN_) named Dilated U-net, which aims to segment the intima-media complex (_IMC_) of the common carotid artery (_CCA_). Any advanced user can easily add their own architectures for training and evaluation. The repository provides:
+The presented GIT is a demonstration of the developed algorithm and can be used as a public a benchmark. It uses a convolutional neural network (_CNN_) named Dilated U-net, which aims to segment the intima-media complex (_IMC_) of the common carotid artery (_CCA_). Any advanced user can easily add their own architectures for training and evaluation. The repository provides codes to:
 * generate the dataset;
 * train a model for far wall detection;
-* train a model for IMC segmentation;
+* train a model for _IMC_ segmentation;
 * far wall detection
 * _IMC_ segmentation by using a manual homemade interface to detect the far wall ou by using predicted far wall position;
 * segmentation evaluation.  
 
-All parameters are set in the folder _**parameters**_:
+All parameters are set in:
 * _**CREATE_REFERENCES_CUBS/set_parameters.m**_: parameters to interpolate images from control points;
 * _**SEGMENTATION/parameters/set_parameters_dataset_template.py**_: parameters to generate the dataset;
 * _**SEGMENTATION/parameters/set_parameters_inference_template.py**_: parameters to segment the image;
@@ -21,11 +21,12 @@ All parameters are set in the folder _**parameters**_:
 
 # Prerequisites
 
-A file named _environment.yml_ is provided to install all the used libraries. For Linux users, you should install conda then move into the folder containing the _environment.yml_ file and run:\
-`conda env create --file envname.yml.
-That would install a conda environment named _caroSegDeep_. To activate it, open a terminal and enter conda activate _caroSegDeep_.\ 
+A file named _environment.yml_ is provided to install all the used libraries. For Linux users, you should install conda then move into the folder containing the _environment.yml_ file and run:  
+`conda env create --file envname.yml`  
+That would install a conda environment named _caroSegDeep_. To activate it, open a terminal and enter:  
+`conda activate _caroSegDeep`  
 
-To run the provided script located in folder **_RUN/_**, Linux users should add thoses lines in their _.bashrc_:
+To run the provided scripts in **_RUN/_**, Linux users should add thoses lines in their _.bashrc_:
 
 `# >>> conda initialize >>>`  
 `# !! Contents within this block are managed by 'conda init' !!`  
@@ -45,7 +46,9 @@ To run the provided script located in folder **_RUN/_**, Linux users should add 
 
 # How to create the annotation
 
-You must download the CUBS database using the following link: **_TODO_**. Then go to **_CREATE_REFERENCES_CUBS/set_parameters_** and fill in the variables according to your path tree and run **_RUN/run_annotation.m_**. This code interpolates experts' control points and saves information according to **_set_parameters_**. An example is visible below:  
+You must download the CUBS database using the following link: **_TODO_**. Then go to **_CREATE_REFERENCES_CUBS/set_parameters_** and fill in the variables according to your path tree and run:  
+`bash RUN/run_create_references.sh`  
+This code interpolates experts' control points and saves information according to **_set_parameters_**. An example is visible below:  
 
 <p align="center">
   <img width="600" height="450" src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/interpolation_sample.jpg">
@@ -55,23 +58,23 @@ You can easily change the interpolation method in the class _`CREATE_REFERENCES_
 
 # How to create the datasets
 
-Two datasets are needed to train both models _i_) far wall detection_ii_) _IMC_ segmentation. Those datasets will be stored in _.h5_ file name _CUBS_wall.h5_ and _CUBS_far_wall.h5_. To do that, fill in the variables according to your path tree in: **_SEGMENTATION/parameters/set_parameters_dataset_template.py_**.  
+Two datasets are needed to train both models _i_) far wall detection _ii_) _IMC_ segmentation. Those datasets will be stored in _.h5_ file name _CUBS_wall.h5_ and _CUBS_far_wall.h5_. To do that, fill in the variables according to your path tree in: **_SEGMENTATION/parameters/set_parameters_dataset_template.py_**.  
 Then run **_RUN/run_dataset.sh_**. The size of the generated datasets are 24.4Go (for _IMC_ segmentation) and 8.1Go (for far wall detection).
 
 # How to train the models?
 
-To run the training, you need the generated dataset named _CUBS_wall.h5_ and _CUBS_far_wall.h5_. In the proposed folder arrangement, they are stored in **_caroSegDeep/EXAMPLE/DATA/DATASET_**.\
+To run the training, you need the generated dataset named _CUBS_wall.h5_ and _CUBS_far_wall.h5_. In the proposed folder arrangement, they are stored in **_caroSegDeep/EXAMPLE/DATA/DATASET_**.  
   
-As previously, fill in the variables according to your path tree in **_SEGMENTATION/parameters/set_parameters_far_wall_training_template.py_** for far wall detection and **_SEGMENTATION/parameters/set_parameters_caro_seg_deep_training_template.py_** for _IMC_ segmentation.\ 
+As previously, fill in the variables according to your path tree in **_SEGMENTATION/parameters/set_parameters_far_wall_training_template.py_** for far wall detection and **_SEGMENTATION/parameters/set_parameters_caro_seg_deep_training_template.py_** for _IMC_ segmentation.  
   
-Once parameters are filled in, change the working directory, run:\
-1. `bash RUN/run_training_far_wall.sh`\
-2. `bash RUN/run_training_IMC.sh`\
+Once parameters are filled in, change the working directory and run: 
+1. `bash RUN/run_training_far_wall.sh`
+2. `bash RUN/run_training_IMC.sh`
 
 # Inference
 The far wall detection and the _IMC_ segmentation are done separately. You can easily merge them to give the method fully automatic, nevertheless, the analysis would be more difficult. Thus two different scripts are used:  
-1. `RUN/run_FW_detection.sh`\
-2. `RUN/run_IMC_segmentation.sh`\
+1. `RUN/run_FW_detection.sh`
+2. `RUN/run_IMC_segmentation.sh`
 
 
 The parameters are common for both codes, thus fill in according to your path three in:  
@@ -80,11 +83,11 @@ The parameters are common for both codes, thus fill in according to your path th
 The way to use them is described above.  
 
 ## How to detect the far wall?
-To run the far wall detection, modify the working directory in _**RUN/run_IMC_segmentation.sh**_ and enter in a terminal:\
-`bash RUN/run_IMC_segmentation.sh`\
+To run the far wall detection, modify the working directory in _**RUN/run_IMC_segmentation.sh**_ and enter in a terminal:  
+`bash RUN/run_IMC_segmentation.sh`  
 
-The script use the previous trained model named _CUBS_far_wall.h5_. If you do not train the model, you can download a pretrained one on the efollowing link: ADDLINK  and copy it in **_EXAMPLE/TRAINED_MODEL_**.
-Two results are saved:\
+The script uses the previous trained model named _CUBS_far_wall.h5_. If you do not train the model, you can download a pretrained one on the efollowing link: ADDLINK  and copy it in **_EXAMPLE/TRAINED_MODEL_**.
+Two results are saved:  
 1. **_EXAMPLE/RESULTS/INFERENCE/FAR_WALL_DETECTION_**: far wall detection position, saved in .txt file;
 2.  **_EXAMPLE/RESULTS/INFERENCE/IMAGES_FW_**: images on which the far wall detection is superimposed.
 
@@ -95,11 +98,11 @@ Two modes are proposed to segment the _IMC_ _i_) a semi-automatic method which m
   
 The script use the previous trained model named _CUBS_wall.h5_. If you do not train the model, you can download a pretrained one on the  following link: ADDLINK and copy it in **_EXAMPLE/TRAINED_MODEL_**
 
-Then modify the file _**parameters/set_parameters_training_template.py**_ in order to match with your directory and run `bash run_training.sh`.
+Then modify the file _**parameters/set_parameters_training_template.py**_ in order to match with your directory and run `sh run_training.sh`.
 
 The training results is saved in **_caroSegDeep/EXAMPLE/RESULTS/TRAINING_**
 
-To launch the segmentation, run `bash run_segmentation.sh`. The code will segment all images in the folder:
+To launch the segmentation, run `sh run_segmentation.sh`. The code will segment all images in the folder:
  _**caroSegDeep/EXAMPLE/DATA/IMAGES**_. 
 For each image, the user has to manually detect the far wall of the _CCA_. It is a homemade interface, the commands are listed below:
 * _left click:_ set a point;
@@ -128,4 +131,16 @@ Then the algorithm stores the segmentation result in **_.txt_** format for both 
 
 # Evaluation
 
-TODO
+Potential outliers for far wall detection are detected and saved in:  
+_**EXAMPLE/RESULTS/INFERENCE/EVALUATION/FW_OUTLIERS**_  
+  
+Two possibilities are offered to you:
+1. you consider those outliers for _IMC_ segmentation;
+2. you remove these outliers from the folder containing the segmentations, the graphical interface will be called up for patients for whom the distal wall is not detected.
+
+
+For _IMC_ segmentation, two metrics are computed:
+1. mean absolute difference 
+2. DICE coefficient
+
+All results are stored in the folder _**EXAMPLE/RESULTS/INFERENCE/EVALUATION**_ .
