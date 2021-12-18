@@ -28,7 +28,7 @@ class predictionClassIMC():
         self.map_overlay, self.map_prediction = {}, {}      # dictionaries evolve during the inference phase
         self.img = img
 
-        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, (p.MODEL_NAME+'_wall.h5')))
+        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, p.MODEL_NAME_IMC))
     # ------------------------------------------------------------------------------------------------------------------
     def prediction_masks(self, id: int, pos: dict):
         """ Retrieves patches, then preprocessing is applied and the self.build_maps method reassembles them. """
@@ -104,7 +104,7 @@ class predictionClassFW():
         self.patch_width = p.PATCH_WIDTH
         self.patches = []
         self.img = img
-        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, (p.MODEL_NAME+'_far_wall.h5')))
+        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, p.MODEL_NAME_FW))
 
     # ------------------------------------------------------------------------------------------------------------------
     def prediction_masks(self):
