@@ -46,10 +46,13 @@ Forst download CUBS database, then move to **_CREATE_REFERENCES_CUBS/set_paramet
 `bash RUN/run_create_references.sh`  
 This code interpolates experts' control points and saves information according to **_set_parameters_**. An example is visible below:  
 
-<p align="center">
-  <img width="600" height="450" src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/interpolation_sample.jpg">
-</p>
-
+<figure>
+    <p align="center">
+      <img width="600" height="450" src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/interpolation_sample.jpg">
+    <figcaption>Annotation example</figcaption>
+    <p>
+<figure>
+    
 You can easily change the interpolation method in the class _`CREATE_REFERENCES_CUBS/interpolation.m`_, _makima_ and _pchip_ have already been implemented. 
 
 # How to create the datasets
