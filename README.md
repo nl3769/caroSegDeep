@@ -5,16 +5,16 @@ The presented GIT is a demonstration of the developed algorithm and can be used 
 * generate the dataset using the <a href="https://data.mendeley.com/datasets/fpv535fss7/1">CUBS database</a> ;
 * train a model for far wall (_FW_) detection;
 * train a model for _IMC_ segmentation;
-* _FW_ detection
-* _IMC_ segmentation by using a manual homemade interface to detect the far wall ou by using predicted far wall position;
-* segmentation evaluation.  
+* _FW_ detection;
+* _IMC_ segmentation by using a manual homemade interface to detect the _FW_ ou by using predicted _FW_ position;
+* evaluation.  
 
 All parameters are set in:
 * _**CREATE_REFERENCES_CUBS/set_parameters.m**_: parameters to interpolate images from control points;
 * _**SEGMENTATION/parameters/set_parameters_dataset_template.py**_: parameters to generate the dataset;
-* _**SEGMENTATION/parameters/set_parameters_inference_template.py**_: parameters to segment the image;
-* _**SEGMENTATION/set_parameters_caro_seg_deep_training_template.py**_ parameter to train the neural network for _IMC_ segmentation;
-* _**SEGMENTATION/set_parameters_far_wall_training_template.py**_ parameter to train the neural network for far wall detection.
+* _**SEGMENTATION/set_parameters_caro_seg_deep_training_template.py**_ parameters to train the neural network for _IMC_ segmentation;
+* _**SEGMENTATION/set_parameters_far_wall_training_template.py**_ parameters to train the neural network for far wall detection.
+* _**SEGMENTATION/parameters/set_parameters_inference_template.py**_: parameters to segment the image.
 
 More details on the method and results of this database are available here: <a href="https://addcorrectlink">Carotid artery wall segmentation in ultrasound image sequences using a deep convolutional neural network</a>.
 
@@ -22,9 +22,9 @@ More details on the method and results of this database are available here: <a h
 # Prerequisites
 
 A file named _environment.yml_ is provided to install all the used libraries. For Linux users, you should install conda then move into the folder containing the _environment.yml_ file and run:  
-`conda env create --file envname.yml`  
+`conda env create --file environment.yml`  
 That would install a conda environment named _caroSegDeep_. To activate it, open a terminal and enter:  
-`conda activate _caroSegDeep`  
+`conda activate caroSegDeep`  
 
 To run the provided scripts in **_RUN/_**, Linux users should add thoses lines in their _.bashrc_:
 
@@ -46,15 +46,15 @@ To run the provided scripts in **_RUN/_**, Linux users should add thoses lines i
 
 # How to create the annotation?
 
-Forst download CUBS database, then move to **_CREATE_REFERENCES_CUBS/set_parameters_** and fill in the variables according to your path tree and run:  
-`bash RUN/run_create_references.sh`  
-This code interpolates experts' control points and saves information according to **_set_parameters_**. An example is visible below:  
+First download CUBS database, then move to **_CREATE_REFERENCES_CUBS/set_parameters.m_** and fill in the variables according to your path tree and run:  
+`bash RUN/run_create_references.sh` \
+This code interpolates experts' control points and saves results according to **_set_parameters.m_**. The interpolations are saved in **_.txt_**, along with the original images on which the interpolations are superimposed. An example is visible below:  
 
 <p align="center">
     <img width="700" 
          height="450" 
          src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/interpolation_sample.jpg" >
-<p>    
+<p>
 <p align="center">
     <em> Img.1: Example of annotation. Here interpolated control points of three experts are surperimposed. </em>
 <p>
@@ -77,6 +77,9 @@ Once parameters are filled in, change the working directory and run:
 1. `bash RUN/run_training_far_wall.sh`
 2. `bash RUN/run_training_IMC.sh`
 
+The training results are saved in **_caroSegDeep/EXAMPLE/RESULTS/TRAINING_**.
+
+    
 # Inference
 _FW_ detection and the _IMC_ segmentation are done separately. You can easily merge them to give the method fully automatic, nevertheless, the analysis would be more difficult. Thus two different scripts are used:  
 1. `RUN/run_FW_detection.sh`
@@ -85,8 +88,6 @@ _FW_ detection and the _IMC_ segmentation are done separately. You can easily me
 
 The parameters are common for both codes, thus fill in according to your path three in:  
 **_caroSegDeep/SEGMENTATION/parameters/set_parameters_inference_template.py_**.  
-
-How to use them is described above.  
 
 ## How to detect the far wall?
 To run the _FW_ detection, modify the working directory in _**RUN/run_IMC_segmentation.sh**_ and run:  
@@ -100,17 +101,13 @@ Two results are saved:
 
 ## How to segment the _IMC_?
 
-Two modes are proposed to segment the _IMC_ _i_) a semi-automatic method which means that a homemade GUI is used to detect the _FW_ _ii_) a fully automatic method which means that results of the far wall detection are used to initialize the methods for _IMC_ segmentation, if the _FW_ prediction doesn't exist in the searching directory then the homemade GUI is automatically used.
+Two modes are proposed to segment the _IMC_ _i_) a semi-automatic method which means that a homemade GUI is used to detect the _FW_ _ii_) a "fully automatic" method which means that results of the far wall detection are used to initialize the methods for _IMC_ segmentation, if the _FW_ prediction doesn't exist in the searching directory then the homemade GUI is automatically used.
   
-The script uses the previous trained model named _CUBS_wall.h5_. If you do not train the model, you can download a pretrained one by clicking  <a href="https://www.dropbox.com/s/54z21vfm1lmqiyq/IMC_custom_dilated_unet.h5?dl=0">here</a> then copy it in **_EXAMPLE/TRAINED_MODEL_**
-
-Then modify the file _**parameters/set_parameters_training_template.py**_ and run `sh run_training.sh`.
-
-The training results are saved in **_caroSegDeep/EXAMPLE/RESULTS/TRAINING_**
+The script uses the previous trained model named _CUBS_wall.h5_. If you do not train the model, you can download a pretrained one by clicking  <a href="https://www.dropbox.com/s/54z21vfm1lmqiyq/IMC_custom_dilated_unet.h5?dl=0">here</a> then copy it in **_EXAMPLE/TRAINED_MODEL_**. \
 
 To launch the segmentation, run `sh run_segmentation.sh`. The code will segment all images countain in the folder:
  _**caroSegDeep/EXAMPLE/DATA/IMAGES**_. 
-For each image, the user has to manually detect the far wall of the _CCA_. It is a homemade interface, the commands are listed below:
+Below are the commands for using the home interface:
 * _left click:_ set a point;
 * _ctrl+left click:_ leave the graphical interface;
 * _scroll click:_ reset.
@@ -122,7 +119,7 @@ To detect the _FW_, a minimum of four clicks are required:
 4. _fourth click_: point between the right border of the _ROI_ and the right border of the image (click midway distance between the _LI_ and _MA_ interface);
 5. you can add as many points as you want to shape the curve after those four clicks, cubic spline interpolation is used to adjust the curve. 
 
-The _ROI_ is contained between the two red vertical lines and the algorithm segments the _CCA_ between the two bleu vertical lines. This allows for a narrow region to be segmented, this conditionallows is ensured by yourself. An example can be seen in the figure below.
+The _ROI_ is contained between the two red vertical lines and the algorithm segments the _CCA_ between the two bleu vertical lines. This allows for a narrow region to be segmented, this condition is ensured by yourself. An example can be seen in the figure below.
 
 <p align="center">
   <img width="600" height="450" src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/FW_detection_explanation_width_enought.jpg">
@@ -131,7 +128,7 @@ The _ROI_ is contained between the two red vertical lines and the algorithm segm
     <em> Img.2: Manual initialization. </em>
 <p>
 
-Then the algorithm stores the segmentation result in **_.txt_** format for both _LI_ and _MA_ interface two different files. It also saves the image with the segmentation results as shown in the figure below. The results are stored in: \
+Then the algorithm stores the segmentation result in **_.txt_** format for both _LI_ and _MA_ interface in two different files. It also saves the images with the segmentation results as shown in the figure below. The results are stored in: \
  **_caroSegDeep/EXAMPLE/RESULTS/PREDICTION_RESULTS_**
 
 <p align="center">
@@ -152,7 +149,7 @@ Two possibilities are offered to you:
 
 
 For _IMC_ segmentation, two metrics are computed: 
-1. mean absolute difference (_MAE_)
-2. DICE coefficient
+1. mean absolute difference (_MAE_);
+2. DICE coefficient.
 
 All results are stored in the folder _**EXAMPLE/RESULTS/INFERENCE/EVALUATION**_ .
