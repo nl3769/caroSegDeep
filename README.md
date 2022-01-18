@@ -48,8 +48,8 @@ This code interpolates experts' control points and saves information according t
 
 <figure>
     <p align="center">
-      <img width="600" height="450" src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/interpolation_sample.jpg">
-    <figcaption>Annotation example</figcaption>
+        <img width="600" height="450" src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/interpolation_sample.jpg">
+        <figcaption> Annotation example </figcaption>
     <p>
 <figure>
     
