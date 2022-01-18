@@ -1,7 +1,8 @@
 # Overview
 
+
 The presented GIT is a demonstration of the developed algorithm and can be used as a public benchmark. It uses a convolutional neural network (_CNN_) named Dilated U-net, which aims to segment the intima-media complex (_IMC_) of the common carotid artery (_CCA_). Any advanced user can easily add their own architectures for training and evaluation. The repository provides codes to:
-* generate the dataset based on <a href="https://data.mendeley.com/datasets/fpv535fss7/1">CUBS database</a> ;
+* generate the dataset using the <a href="https://data.mendeley.com/datasets/fpv535fss7/1">CUBS database</a> ;
 * train a model for far wall (_FW_) detection;
 * train a model for _IMC_ segmentation;
 * _FW_ detection
@@ -14,6 +15,9 @@ All parameters are set in:
 * _**SEGMENTATION/parameters/set_parameters_inference_template.py**_: parameters to segment the image;
 * _**SEGMENTATION/set_parameters_caro_seg_deep_training_template.py**_ parameter to train the neural network for _IMC_ segmentation;
 * _**SEGMENTATION/set_parameters_far_wall_training_template.py**_ parameter to train the neural network for far wall detection.
+
+More details on the method and results of this database are available here: <a href="https://addcorrectlink">Carotid artery wall segmentation in ultrasound image sequences using a deep convolutional neural network</a>.
+
 
 # Prerequisites
 
@@ -40,22 +44,25 @@ To run the provided scripts in **_RUN/_**, Linux users should add thoses lines i
 `# <<< conda initialize <<<`  
 
 
-# How to create the annotation
+# How to create the annotation?
 
 Forst download CUBS database, then move to **_CREATE_REFERENCES_CUBS/set_parameters_** and fill in the variables according to your path tree and run:  
 `bash RUN/run_create_references.sh`  
 This code interpolates experts' control points and saves information according to **_set_parameters_**. An example is visible below:  
 
-<figure>
-    <p align="center">
-        <img width="600" height="450" src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/interpolation_sample.jpg">
-        <center><figcaption> Annotation example </figcaption><center>
-    <p>
-<figure>
+<p align="center">
+    <img width="700" 
+         height="450" 
+         src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/interpolation_sample.jpg" >
+<p>    
+<p align="center">
+    <em> Img.1: Example of annotation. Here interpolated control points of three experts are surperimposed. </em>
+<p>
+
     
 You can easily change the interpolation method in the class _`CREATE_REFERENCES_CUBS/interpolation.m`_, _makima_ and _pchip_ have already been implemented. 
 
-# How to create the datasets
+# How to create the datasets?
 
 Two datasets are needed to train both models _i_) _FW_ detection _ii_) _IMC_ segmentation. Those datasets will be stored in _.h5_ file, named _CUBS_wall.h5_ and _CUBS_far_wall.h5_. To do that, fill in the variables according to your path tree in: **_SEGMENTATION/parameters/set_parameters_dataset_template.py_**.  
 Then run **_RUN/run_dataset.sh_**. The size of the generated datasets are 24.4Go (for _IMC_ segmentation) and 8.1Go (for _FW_ detection).
@@ -115,31 +122,37 @@ To detect the _FW_, a minimum of four clicks are required:
 4. _fourth click_: point between the right border of the _ROI_ and the right border of the image (click midway distance between the _LI_ and _MA_ interface);
 5. you can add as many points as you want to shape the curve after those four clicks, cubic spline interpolation is used to adjust the curve. 
 
-The _ROI_ is contained between the two vertical red lines and the algorithm segments the _CCA_ between the two vertical blue lines. This allows you to segment a narrow region, this condition is ensured by yourself. An example is visible in the figure below.
+The _ROI_ is contained between the two red vertical lines and the algorithm segments the _CCA_ between the two bleu vertical lines. This allows for a narrow region to be segmented, this conditionallows is ensured by yourself. An example can be seen in the figure below.
 
 <p align="center">
   <img width="600" height="450" src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/FW_detection_explanation_width_enought.jpg">
 </p>
+<p align="center">
+    <em> Img.2: Manual initialization. </em>
+<p>
 
-Then the algorithm stores the segmentation result in **_.txt_** format for both _LI_ and _MA_ interface two different files. It also saves the image with the segmentation results as shown in the figure below. The results are stored in:
+Then the algorithm stores the segmentation result in **_.txt_** format for both _LI_ and _MA_ interface two different files. It also saves the image with the segmentation results as shown in the figure below. The results are stored in: \
  **_caroSegDeep/EXAMPLE/RESULTS/PREDICTION_RESULTS_**
 
 <p align="center">
   <img width="600" height="450" src="https://github.com/nl3769/caroSegDeep/blob/master/.IMAGE_WIKI/clin_0006_R.jpg">
 </p>
+<p align="center">
+    <em> Img.3: Result. </em>
+<p>
 
 # Evaluation
 
 Potential outliers for _FW_ detection are detected and saved in:  
 _**EXAMPLE/RESULTS/INFERENCE/EVALUATION/FW_OUTLIERS**_  
   
-Two possibilities are offered to you:
+Two possibilities are offered to you: 
 1. you consider these outliers for _IMC_ segmentation;
 2. you remove these outliers from the folder containing the segmentation, then the graphical interface will be called up for patients for whom the _FW_ is not detected.
 
 
-For _IMC_ segmentation, two metrics are computed:
-1. mean absolute difference 
+For _IMC_ segmentation, two metrics are computed: 
+1. mean absolute difference (_MAE_)
 2. DICE coefficient
 
 All results are stored in the folder _**EXAMPLE/RESULTS/INFERENCE/EVALUATION**_ .
