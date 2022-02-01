@@ -16,7 +16,7 @@ All parameters are set in:
 * _**SEGMENTATION/set_parameters_far_wall_training_template.py**_ parameters to train the neural network for far wall detection.
 * _**SEGMENTATION/parameters/set_parameters_inference_template.py**_: parameters to segment the image.
 
-More details on the method and results of this database are available here: <a href="https://addcorrectlink">Carotid artery wall segmentation in ultrasound image sequences using a deep convolutional neural network</a>.
+More details on the method and results of this database are available here: <a href="https://arxiv.org/abs/2201.12152">Carotid artery wall segmentation in ultrasound image sequences using a deep convolutional neural network</a>.
 
 
 # Prerequisites
