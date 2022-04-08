@@ -1,4 +1,4 @@
-from parameters.parameters_caro_seg_deep_training import Parameters
+from parameters.parameters_far_wall_deep_training import Parameters
 import os
 from shutil import copyfile
 
@@ -26,24 +26,27 @@ def setParameters():
 
   p = Parameters(
     # --- relative to the training phase
-    NB_EPOCH=2,                                 # Number of training epochs
-    NBPATIENCE_EPOCHS=5,                        # The training is stopped if the loss on validation data does not improve after NBPATIENCE_EPOCHS epochs
-    BATCH_SIZE=1,                                # select the batch size
-    DATA_AUGMENTATION=True,                       # True to apply data augmentation on training sets only
-    MODEL_SELECTION='custom_dilated_unet',        # The name of the desired architecture
-    LEARNING_RATE=0.001,                          # The starting value of the learning rate
-    LOSS='dice_bce_loss',                         # The desired loss function
-    PATH_TO_SAVE_PREDICTION_DURING_TRAINING='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/TRAINING/FAR_WALL_MODEL/', # An image is predicted at the end of an epoch during training, and will be saved in the specified path.
+    NB_EPOCH=5,                                                                                                                            # Number of training epochs
+    NBPATIENCE_EPOCHS=50,                                                                                                                   # Stop training if not amelioration
+    BATCH_SIZE=8,                                                                                                                           # select the batch size
+    DATA_AUGMENTATION=True,                                                                                                                 # True to apply data augmentation on training sets only
+    MODEL_SELECTION='custom_dilated_unet',                                                                                                  # The name of the desired architecture
+    LEARNING_RATE=0.001,                                                                                                                    # The starting value of the learning rate
+    LOSS='dice_bce_loss',                                                                                                                   # The desired loss function
+    PATH_TO_SAVE_PREDICTION_DURING_TRAINING='/run/media/laine/HDD/PROJECTS_IO/caroSegDeep/RESULTS/EXP0/FAR_WALL_MODEL/TRAINING/',           # Save prediction of one at the end of each epoch during training
     PATCH_HEIGHT=512,  # The height of a patch
     PATCH_WIDTH=128,  # The width of a patch
 
     # --- relative to results
-    PATH_TO_SAVE_TENSORBOARD='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/TRAINING/FAR_WALL_MODEL/TENSORBOARD/',                           # path to save tensorboard
-    PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/TRAINING/FAR_WALL_MODEL/PREDICTION_RESULTS/',    # where metrics/pdf are saved
-    NAME_OF_THE_EXPERIMENT='EXAMPLE', # name of the experiment will appear in the directories where the results are stored. !!!!!!!!! FOLD !!!!!!!!!
+    PATH_TO_SAVE_TENSORBOARD='/run/media/laine/HDD/PROJECTS_IO/caroSegDeep/RESULTS/EXP0/FAR_WALL_MODEL/TENSORBOARD/',                           # path to save tensorboard
+    PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS='/run/media/laine/HDD/PROJECTS_IO/caroSegDeep/RESULTS/EXP0/FAR_WALL_MODEL/PREDICTION_RESULTS/',    # where metrics/pdf are saved
+    NAME_OF_THE_EXPERIMENT='EXAMPLE',                                                                                                           # name of the experiment
 
     # --- relative to data
-    PATH_TO_DATASET='/home/laine/Documents/REPO/caroSegDeep/EXAMPLE/RESULTS/DATASET/DATASET/CUBS_far_wall.h5', # Path where dataset in .h5 is saved
+    PATH_TO_DATASET='/run/media/laine/HDD/PROJECTS_IO/caroSegDeep/DATASET/CUBS_far_wall.h5',                                                    # Path where dataset in .h5 is saved
+    PATH_FOLD={'training': '/home/laine/cluster/PROJECTS_IO/DATA/MEIBURGER/Folds/f0/TrainList.txt',                                             # Path to fold
+               'validation': '/home/laine/cluster/PROJECTS_IO/DATA/MEIBURGER/Folds/f0/ValList.txt',
+               'testing': '/home/laine/cluster/PROJECTS_IO/DATA/MEIBURGER/Folds/f0/TestList.txt'}
     )
 
   # --- Print all attributes in the console

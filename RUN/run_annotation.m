@@ -41,7 +41,7 @@ while size(names_patient, 2)>1
     path_to_image = p.PATH_TO_IMAGES;
     name_=split(names_patient{inc}, '-');
     name_=name_{1};
-    image_name=strcat(path_to_image, name_, '.tiff');
+    image_name=fullfile(path_to_image, strcat(name_, '.tiff'));
     image=loadData.load_image(image_name);
     % --- we modify the image
     image=modify_image(LI_int_A1, MA_int_A1, LI_A1, MA_A1, image, 'A1');

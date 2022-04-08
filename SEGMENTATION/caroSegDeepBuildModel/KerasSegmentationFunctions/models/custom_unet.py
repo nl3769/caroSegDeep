@@ -1,16 +1,15 @@
-import tensorflow
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import BatchNormalization, Conv2D, Conv2DTranspose, MaxPooling2D, Dropout, SpatialDropout2D, UpSampling2D, Input, concatenate
-
-# tmp = tensorflow.keras.layers.LeakyReLU(alpha=0.3, **kwargs)
 
 
 def upsample_conv(filters, kernel_size, strides, padding):
     return Conv2DTranspose(filters, kernel_size, strides=strides, padding=padding)
 
+# ----------------------------------------------------------------------------------------------------------------------
 def upsample_simple(filters, kernel_size, strides, padding):
     return UpSampling2D(strides)
 
+# ----------------------------------------------------------------------------------------------------------------------
 def conv2d_block(
     inputs, 
     use_batch_norm = True,
@@ -33,6 +32,7 @@ def conv2d_block(
         c = BatchNormalization()(c)
     return c
 
+# ----------------------------------------------------------------------------------------------------------------------
 def custom_unet(
     input_shape,
     num_classes = 1,
@@ -46,7 +46,7 @@ def custom_unet(
     output_activation = 'sigmoid', # 'sigmoid' or 'softmax'
     kernel_regularizer = 'None'):
     
-    if upsample_mode == 'deconv':
+    if upsample_mode == 'deconv':# ----------------------------------------------------------------------------------------------------------------------
         upsample = upsample_conv
     else:
         upsample = upsample_simple
@@ -81,3 +81,5 @@ def custom_unet(
     model = Model(inputs=[inputs], outputs=[outputs])
 
     return model
+
+# ----------------------------------------------------------------------------------------------------------------------
