@@ -58,7 +58,8 @@ def read_CF_directory(path):
     """Read calibration factor. """
     f = open(path, "r")
     val = f.readline().split(' \n')
-    return float(val[0])
+
+return float(val[0])
 
 # ----------------------------------------------------------------------------------------------------------------------
 def get_border_expert(IFC3, IFC4):
@@ -216,6 +217,7 @@ def load_prediction_FW(patientName: str, path: str):
         if k==len(prediction)-1:
             right_border=int(prediction[k].split('\n')[0].split(' ')[0])
     pred=np.concatenate((np.zeros(left_border), pred))
+
     return pred, {'left_border': left_border, 'right_border': right_border}
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -228,4 +230,5 @@ def get_narrow_borders(borders_expert, borders_pred):
     borders_roi={'left_border': left_border_r,'right_border': right_border_r}
 
     return borders_roi
+
 # ----------------------------------------------------------------------------------------------------------------------

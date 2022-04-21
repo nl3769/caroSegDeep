@@ -1,7 +1,7 @@
-'''
+"""
 @Author  :   <Nolann Lainé>
 @Contact :   <nolann.laine@outlook.fr>
-'''
+"""
 
 import cv2
 import numpy as np
@@ -12,9 +12,9 @@ from caroSegDeepBuildModel.KerasSegmentationFunctions.models.custom_dilated_unet
 
 class predictionClassIMC():
 
-    ''' The prediction class contains the trained architecture and performs the following calculations:
+    """ The prediction class contains the trained architecture and performs the following calculations:
     - prediction of masks
-    - compute overlay and prediction maps '''
+    - compute overlay and prediction maps """
     
     def __init__(self, dimensions: tuple, patch_height: int, patch_width: int, borders: dict, p, img=None):
 
@@ -28,10 +28,12 @@ class predictionClassIMC():
         self.map_overlay, self.map_prediction = {}, {}      # dictionaries evolve during the inference phase
         self.img = img
 
-        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, p.MODEL_NAME_IMC))
+        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, p.MODEL_NAME))
+
     # ------------------------------------------------------------------------------------------------------------------
     def prediction_masks(self, id: int, pos: dict):
         """ Retrieves patches, then preprocessing is applied and the self.build_maps method reassembles them. """
+
         patchImg = []
         for i in range(len(self.patches)):
             patchImg.append(self.patches[i]["patch"])
@@ -43,9 +45,11 @@ class predictionClassIMC():
         self.predicted_masks = masks.copy()
         # --- reassemble patches
         self.build_maps(prediction=masks, id=id, pos=pos)
+
     # ------------------------------------------------------------------------------------------------------------------
     def build_maps(self, prediction: np.ndarray, id: int, pos: dict):
-        ''' Assembles the patches and predictions to create the overlay map and the prediction map. '''
+        """ Assembles the patches and predictions to create the overlay map and the prediction map. """
+
         pred_, overlay_ = np.zeros((pos['max'] - pos['min'], self.dim[2])), np.zeros((pos['max'] - pos['min'], self.dim[2]))
         for i in range(len(self.patches)):
             patch_ = self.patches[i]
@@ -63,9 +67,11 @@ class predictionClassIMC():
         self.final_mask_org = np.zeros(self.dim[1:])
         mask_tmp_height = pred_.shape[0]
         self.final_mask_org[pos['min']:(pos['min'] + mask_tmp_height),:] = pred_
+
     # ------------------------------------------------------------------------------------------------------------------
     def load_model(self, model_name: str):
-        ''' Loads the trained architecture. '''
+        """ Loads the trained architecture. """
+
         model = custom_dilated_unet(input_shape=(512, 128, 1),
                                     mode='cascade',
                                     filters=32,
@@ -80,9 +86,10 @@ class predictionClassIMC():
 
         model.load_weights(model_name)
         return model
+    
     # ------------------------------------------------------------------------------------------------------------------
     def patch_preprocessing(self, patches: np.ndarray):
-        ''' Patch preprocessing -> linear histogram between 0 and 255. '''
+        """ Patch preprocessing -> linear histogram between 0 and 255. """
         for k in range(patches.shape[0]):
             tmp = patches[k,]
             min = tmp.min()
@@ -92,8 +99,10 @@ class predictionClassIMC():
                 max = 0.1
             tmp = tmp*255/max
             patches[k,] = tmp
+
         return patches
 
+ # ---------------------------------------------------------------------------------------------------------------------
 class predictionClassFW():
 
     def __init__(self, dimensions, p, img = None):
@@ -150,7 +159,7 @@ class predictionClassFW():
 
     # ------------------------------------------------------------------------------------------------------------------
     def load_model(self, modelName):
-        ''' Load the model. '''
+        """ Load the model. """
         model = custom_dilated_unet(input_shape=(512, 128, 1),
                                     mode='cascade',
                                     filters=32,
@@ -167,7 +176,7 @@ class predictionClassFW():
 
     # ------------------------------------------------------------------------------------------------------------------
     def patch_preprocessing(self, patches):
-        ''' Patch preprocessing, spread grayscale value between 0 and 255. '''
+        """ Patch preprocessing, spread grayscale value between 0 and 255. """
         for k in range(patches.shape[0]):
             tmp = patches[k,]
             min = tmp.min()
@@ -177,3 +186,4 @@ class predictionClassFW():
             patches[k,] = tmp
 
         return patches
+ # ---------------------------------------------------------------------------------------------------------------------

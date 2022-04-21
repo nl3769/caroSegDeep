@@ -1,7 +1,7 @@
-'''
+"""
 @Author  :   <Nolann Lainé>
 @Contact :   <nolann.laine@outlook.fr>
-'''
+"""
 
 from classes.cv2Annotation import cv2Annotation
 from functions.get_biggest_connected_region import get_biggest_connected_region
@@ -12,14 +12,15 @@ import os
 
 # ----------------------------------------------------------------------------------------------------------------------
 def load_borders(borders_path):
-    ''' Load the right and left border from expert annoation instead to use GUI. '''
+    """ Load the right and left border from expert annotation instead to use GUI. """
+
     mat_b = scipy.io.loadmat(borders_path)
     right_b = mat_b['border_right']
     right_b = right_b[0, 0] - 1
     left_b = mat_b['border_left']
     left_b = left_b[0, 0] - 1
 
-    # --- we increase the size of the boarders if they are not large enough (128 is the width of the patch)
+    # --- we increase the size of the borders if they are not big enough (128 is the width of the patch)
     if right_b-left_b<128:
         k=round((right_b-left_b)/2)+1
         right_b=right_b+k
@@ -27,9 +28,12 @@ def load_borders(borders_path):
 
     return {"leftBorder": left_b,
             "rightBorder": right_b}
+
 # ----------------------------------------------------------------------------------------------------------------------
 def load_FW_prediction(path: str):
-    ''' Load the far wall prediction. '''
+    """ Load the far wall prediction. """
+
+
     predN = open(path, "r")
     prediction = predN.readlines()
     predN.close()
@@ -38,13 +42,14 @@ def load_FW_prediction(path: str):
         pred[k] = prediction[k].split('\n')[0].split(' ')[-1]
 
     return pred
+
 # ----------------------------------------------------------------------------------------------------------------------
 class annotationClassIMC():
 
-    ''' annotationClass contains functions to:
+    """ annotationClass contains functions to:
         - update annotations
         - initialize the annotation maps
-        - compute the intima-media thickness '''
+        - compute the intima-media thickness """
 
     def __init__(self, dimension: tuple, first_frame: np.ndarray, scale: float, overlay: int, patient_name: str, p=None):
 
@@ -62,20 +67,21 @@ class annotationClassIMC():
         keys = list(self.borders.keys())
         print(keys[0] + " = ", self.borders[keys[0]])
         print(keys[1] + " = ", self.borders[keys[1]])
+
     # ------------------------------------------------------------------------------------------------------------------
     def initialization(self, localization: np.ndarray, scale: float):
-        ''' Initialize map_annotation with the manual delineation. '''
-        IFC3 = np.zeros(self.seq_dimension[2])
-        IFC4 = np.zeros(self.seq_dimension[2])
+        """ Initialize map_annotation with the manual delineation. """
 
-        IFC3[self.borders_ROI['leftBorder']:self.borders_ROI['rightBorder']] = localization*scale
-        IFC4[self.borders_ROI['leftBorder']:self.borders_ROI['rightBorder']] = localization*scale
+        IFC3 = localization*scale
+        IFC4 = localization*scale
 
         self.map_annotation[0, :, 0] = IFC3
         self.map_annotation[0, :, 1] = IFC4
+
     # ------------------------------------------------------------------------------------------------------------------
     def update_annotation(self, previous_mask: np.ndarray, frame_ID: int, offset: int):
-        ''' Computes the position of the LI and MA interfaces according to the predicted mask. '''
+        """ Computes the position of the LI and MA interfaces according to the predicted mask. """
+
         # --- window of +/- neighbours pixels where the algorithm searches the borders
         neighours = 30  
         # --- the algorithm starts from the left to the right
@@ -100,23 +106,21 @@ class annotationClassIMC():
         self.MA_center_to_right_propagation(j, seed, x_end, dim, previous_mask, offset, self.map_annotation[frame_ID,], neighours, limit)
 
         return previous_mask
+
     # ------------------------------------------------------------------------------------------------------------------
     def get_far_wall(self, img: np.ndarray, patient_name: str, p):
 
         # --- check if the far wall of the current patient had been predicted
-        prediction_=os.listdir(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'FAR_WALL_DETECTION'))
+        prediction_ = os.listdir(p.PATH_FAR_WALL_SEGMENTATION_RES)
         name_ = patient_name.split('.')[0]+'.txt'
 
         # --- if the far wall was not predicted it is done manually
         if p.USED_FAR_WALL_DETECTION_FOR_IMC and (name_ in prediction_):
-            path_borders=os.path.join(p.PATH_TO_BORDERS, patient_name.split('.')[0] + "_borders.mat")
-            borders=load_borders(path_borders)
-            path_FW_pred=os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'FAR_WALL_DETECTION', patient_name.split('.')[0] + ".txt")
-            FW_pred=load_FW_prediction(path_FW_pred)
-            borders_ROI=[borders['leftBorder'], borders['rightBorder']]
+            path_FW_pred = os.path.join(p.PATH_FAR_WALL_SEGMENTATION_RES, patient_name.split('.')[0] + ".txt")
+            FW_pred = load_FW_prediction(path_FW_pred)
+            borders = np.nonzero(FW_pred)
+            borders_ROI = [np.min(borders), np.max(borders)]
 
-            # --- remove the last value to fit with other functions
-            FW_pred=FW_pred[:-1]
 
             return FW_pred, '', borders_ROI, borders_ROI
         else:
@@ -127,19 +131,23 @@ class annotationClassIMC():
             image[:, :, 2] = img.copy()
             coordinateStore = cv2Annotation("Far wall manual detection", image.astype(np.uint8))
             return coordinateStore.getpt()
+
     # ------------------------------------------------------------------------------------------------------------------
     def IMT(self):
-        ''' Compute the IMT. '''
+        """ Compute the IMT. """
+
         xLeft = self.borders['leftBorder']
         xRight = self.borders['rightBorder']
 
         IMT = self.map_annotation[:, xLeft:xRight, 1] - self.map_annotation[:, xLeft:xRight, 0]
 
         return np.mean(IMT, axis=1), np.median(IMT, axis=1)
+
     # ------------------------------------------------------------------------------------------------------------------
     @staticmethod
     def yPosition(xLeft: int, width: int, height: int, map: np.ndarray):
-        ''' Compute the y position on which the current patch will be centered. '''
+        """ Compute the y position on which the current patch will be centered. """
+
         xRight = xLeft + width
 
         # --- we load the position of the LI and MA interfaces
@@ -159,12 +167,14 @@ class annotationClassIMC():
             y_mean, y_min, y_max = 0, 0, 0
 
         return y_mean, y_min, y_max
+
     # ------------------------------------------------------------------------------------------------------------------
     # --- use numba to be faster
     @staticmethod
     @jit(nopython=True)
     def LI_center_to_right_propagation(j: int, seed: tuple, x_end: int, dim: tuple, previous_mask: np.ndarray, offset: int, map_annotation: np.ndarray, neighours: int, limit: int):
-        ''' Computes the LI interface from the center to the right. '''
+        """ Computes the LI interface from the center to the right. """
+
         for i in range(seed[1] + 1, x_end):
             # --- if condition while a boundary is found
             condition = True
@@ -184,12 +194,14 @@ class annotationClassIMC():
             # --- we initialize the new neighbours windows as well as the new limit value (+1 to compensate j+=1)
             j -= neighours + 1
             limit = j + 2 * neighours
+
     # ------------------------------------------------------------------------------------------------------------------
     # --- use numba to be faster
     @staticmethod
     @jit(nopython=True)
     def LI_center_to_left_propagation(j: int, seed: tuple, x_start: int, dim: tuple, previous_mask: np.ndarray, offset: int, map_annotation: np.ndarray, neighours: int, limit: int):
-        ''' Computes the LI interface from the center to the left. '''
+        """ Computes the LI interface from the center to the left. """
+
         for i in range(seed[1], x_start - 1, -1):
             # --- if condition while a boundary is found
             condition = True
@@ -210,12 +222,14 @@ class annotationClassIMC():
             # --- we initialize the new neighbours windows as well as the new limit value (+1 to compensate j+=1)
             j -= neighours + 1
             limit = j + 2 * neighours
+
     # ------------------------------------------------------------------------------------------------------------------
     # --- use numba to be faster
     @staticmethod
     @jit(nopython=True)
     def MA_center_to_right_propagation(j: int, seed: tuple, x_end: int, dim: tuple, previous_mask: np.ndarray, offset: int, map_annotation: np.ndarray, neighours: int, limit: int):
-        ''' Computes the MA interface from the center to the right. '''
+        """ Computes the MA interface from the center to the right. """
+
         for i in range(seed[1] + 1, x_end):
             condition = True
 
@@ -234,12 +248,14 @@ class annotationClassIMC():
 
             j -= neighours + 1
             limit = j + 2 * neighours
+
     # ------------------------------------------------------------------------------------------------------------------
     # --- use numba to be faster
     @staticmethod
     @jit(nopython=True)
     def MA_center_to_left_propagation(j: int, seed: tuple, x_start: int, dim: tuple, previous_mask: np.ndarray, offset: int, map_annotation: np.ndarray, neighours: int, limit: int):
-        ''' Computes the MA interface from the center to the left. '''
+        """ Computes the MA interface from the center to the left. """
+
         for i in range(seed[1], x_start - 1, -1):
             condition = True
 
@@ -258,9 +274,10 @@ class annotationClassIMC():
             j -= neighours + 1
             limit = j + 2 * neighours
 
+# ----------------------------------------------------------------------------------------------------------------------
 class annotationClassFW():
 
-    ''' TODO '''
+    """ TODO """
 
     def __init__(self, dimension: tuple, borders_path, first_frame: np.ndarray, scale: float, overlay: int, patient_name: str, p):
 
@@ -271,7 +288,8 @@ class annotationClassFW():
 
     # ------------------------------------------------------------------------------------------------------------------
     def FW_auto_initialization(self, img, seed):
-        ''' Retreive the approximate position of the far wall. '''
+        """ Retreive the approximate position of the far wall. """
+
         # --- window of +/- neighbours pixels where the algorithm search the borders
         neighours = 10
         # --- the algorithm starts from the left to the right

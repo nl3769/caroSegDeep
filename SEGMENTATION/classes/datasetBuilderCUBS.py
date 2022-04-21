@@ -12,7 +12,7 @@ from functions.load_datas import load_borders, load_tiff, load_annotation, get_f
 from functions.patch_extraction import patch_extraction_wall, patch_extraction_far_wall
 from functions.split_data import split_data_fold
 
-def write_unseen_images(pres: str, pimg: str, keys: list):
+def write_unseen_images(pres: str, substr: str, pimg: str, keys: list):
     """ Write images that cannot be used for training in .txt file. """
 
     # --- get files
@@ -20,38 +20,34 @@ def write_unseen_images(pres: str, pimg: str, keys: list):
     # --- get difference between lists
     diff = list(set(files) - set(keys))
     # --- save images name
-    with open(os.path.join(pres, "unseen_images.txt"), "w") as f:
+    with open(os.path.join(pres, substr + "unseen_images.txt"), "w") as f:
         [f.write(key + '\n') for key in diff]
 
 # ----------------------------------------------------------------------------------------------------------------------
 def save_dic_to_HDF5(dic_datas: dict, path: str):
     """ Save patches in .h5 file with train/validation/test sets. """
 
-    # --- we open the file
+    # def dic_datas(self, path):
+    """ Save patches in .h5 file with train/validation/test sets. """
     f = h5py.File(path, "w")
     for key in dic_datas.keys():
         print(f"The {key} set is being written.")
 
-        gr = key
-        tmp_gr = f.create_group(name=gr)
+        tmp_gr = f.create_group(name=key)
 
-        tmp_gr_mask = tmp_gr.create_group(name="masks")                 # group for mask
-        tmp_gr_img = tmp_gr.create_group(name="img")                    # group for patch (img)
-        tmp_gr_patient_name = tmp_gr.create_group(name="patientName")   # group for name
-        tmp_gr_sr = tmp_gr.create_group(name="spatial_resolution")      # group for spatial resolution (used for hausdorff distance)
+        tmp_gr_mask = tmp_gr.create_group(name="masks")                                                             # group for mask
+        tmp_gr_img = tmp_gr.create_group(name="img")                                                                # group for patch (img)
+        tmp_gr_sr = tmp_gr.create_group(name="spatial_resolution")                                                  # group for spatial resolution (used for hausdorff distance)
 
         data = dic_datas[key]
+        rkey = list(data.keys())[0]
 
-        # --- write information
-        for i in data["masks"].keys():
-            tmp_gr_mask.create_dataset(name=i, data=data["masks"][i],
-                                       dtype=np.uint8)  # we convert in uint8 order to gain memory usage
-            tmp_gr_img.create_dataset(name=i, data=data["images"][i], dtype=np.float32)
-            tmp_gr_sr.create_dataset(name=i, data=data["spatial_resolution"][i], dtype=np.float32)
+        # --- Writes information
+        for patch_id in data[rkey].keys():
+            tmp_gr_mask.create_dataset(name=patch_id, data=data["patch_mask"][patch_id], dtype=np.uint8)                     # we convert in uint8 order to gain memory usage
+            tmp_gr_img.create_dataset(name=patch_id, data=data["patch_Image_org"][patch_id], dtype=np.float32)
+            tmp_gr_sr.create_dataset(name=patch_id, data=data["spatial_resolution"][patch_id], dtype=np.float32)
 
-        for j in range(len(data["patient_name"])):
-            tmp_gr_patient_name.create_dataset(name="Patient_" + str(j) + "_name", data=data["patient_name"][j])
-    # --- we close the file
     f.close()
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -102,9 +98,8 @@ class datasetBuilderIMC():
                     self.dic_datas[files_cubs[img_index]] = datas_
         skipped_sequences.close()
         print("Total image: ", self.im_nb)
-        unseen_images = open(os.path.join(self.p.PATH_TO_SKIPPED_SEQUENCES, "unseen_images.txt"), "w")
+        write_unseen_images(pres=self.p.PATH_TO_SKIPPED_SEQUENCES, substr='wall_', pimg=self.p.PATH_TO_SEQUENCES, keys=list(self.dic_datas.keys()))
         save_dic_to_HDF5(self.dic_datas, os.path.join(self.p.PATH_TO_SAVE_DATASET, self.p.DATABASE_NAME[0]+ "_wall.h5"))
-        unseen_images.close()
 
 # ----------------------------------------------------------------------------------------------------------------------
 class datasetBuilderFarWall():
@@ -150,8 +145,8 @@ class datasetBuilderFarWall():
                     self.dic_datas[files_cubs[img_index]] = datas_
         skipped_sequences.close()
         print("Total image: ", self.im_nb)
-        write_unseen_images(self.p.PATH_TO_SKIPPED_SEQUENCES, pimg = self.p.PATH_TO_SEQUENCES, keys=list(self.dic_datas.keys()))
-        self.save_dic_to_HDF5(path=os.path.join(self.p.PATH_TO_SAVE_DATASET, self.p.DATABASE_NAME[0]+ "_far_wall.h5"))
+        write_unseen_images(pres=self.p.PATH_TO_SAVE_DATASET, substr='far_wall_', pimg = self.p.PATH_TO_SEQUENCES, keys=list(self.dic_datas.keys()))
+        save_dic_to_HDF5(self.dic_datas, path=os.path.join(self.p.PATH_TO_SAVE_DATASET, self.p.DATABASE_NAME[0] +  "_far_wall.h5"))
 
     # ------------------------------------------------------------------------------------------------------------------
     def save_dic_to_HDF5(self, path):
@@ -164,7 +159,6 @@ class datasetBuilderFarWall():
 
             tmp_gr_mask = tmp_gr.create_group(name="masks")                                                             # group for mask
             tmp_gr_img = tmp_gr.create_group(name="img")                                                                # group for patch (img)
-            # tmp_gr_patient_name = tmp_gr.create_group(name="patientName")                                               # group for name
             tmp_gr_sr = tmp_gr.create_group(name="spatial_resolution")                                                  # group for spatial resolution (used for hausdorff distance)
 
             data = self.dic_datas[key]
