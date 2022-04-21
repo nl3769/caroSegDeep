@@ -60,6 +60,7 @@ def load_DICOM_sequence(sequence: str, spatial_res: int, full_seq: bool):
         out, scale = sequence_preprocessing(sequence=out, current_spatial_res=spatial_res_y, spatial_res=spatial_res)
 
     return out, scale, spatial_res_y, firstFrame
+  
 # ----------------------------------------------------------------
 def load_MAT_sequence(sequence: str, spatial_res: int, full_seq: bool):
     ''' Loads the first frame or the sequence stored in MAT and returns the interpolated image(s) and the scale coefficient. '''
@@ -93,6 +94,7 @@ def load_MAT_image(sequence: str, spatial_res: int):
                                        spatial_res=spatial_res)
 
     return out, scale, spatial_res_y, firstFrame
+  
 # ----------------------------------------------------------------
 def load_TIFF_image(sequence: str, spatial_res: int, CF_path: str):
     ''' Load tiff image and returns the interpolated image and the scale coefficient. '''
@@ -115,6 +117,7 @@ def read_CF_directory(path: str):
     f = open(path, "r")
     val = f.readline().split(' \n')
     return float(val[0])/10
+  
 # ----------------------------------------------------------------
 def sequence_preprocessing(sequence: str, current_spatial_res: float, spatial_res: float):
     ''' Sequence preprocessing -> vertical interpolation to reach a vertical pixel size of spatial_resolution. '''
@@ -132,6 +135,7 @@ def sequence_preprocessing(sequence: str, current_spatial_res: float, spatial_re
 
 
     return out.astype(np.float32), scale
+  
 # ----------------------------------------------------------------
 def load_borders(path: str):
     ''' Loads borders in .mat file and return the left and the right borders. '''
@@ -142,6 +146,7 @@ def load_borders(path: str):
     left_b = left_b[0, 0]
 
     return left_b-1, right_b-1
+  
 # ----------------------------------------------------------------
 def load_tiff(sequence: str, PATH_TO_CF: str):
     '''Loads a tiff image. For the CUBS database, each .tiff has an external .txt file that contains the pixel size (CF).
@@ -153,12 +158,14 @@ def load_tiff(sequence: str, PATH_TO_CF: str):
     spatial_res_y = read_CF_file(path_spacing)
 
     return spatial_res_y, seq
+  
 # ----------------------------------------------------------------
 def read_CF_file(path: str):
     ''' Loads pixel size in .txt file for CUBS database. '''
     f = open(path, "r")
     val = f.readline().split(' \n')
     return float(val[0])/10
+  
 # ----------------------------------------------------------------
 def load_annotation(path: str, patient: str, nameExpert: str):
     ''' Loads annotation stored in .mat file. The function returns two vectors corresponding to LI and MA interfaces.'''
@@ -171,6 +178,7 @@ def load_annotation(path: str, patient: str, nameExpert: str):
     IFC4 = IFC4['seg']
 
     return IFC3, IFC4
+  
 # ----------------------------------------------------------------
 def get_files(path: str):
     """ Returns a list containing the name of all the files. """
