@@ -114,3 +114,4 @@ class dataGenerator(tensorflow.keras.utils.Sequence):
             return x, y.astype(np.float32)
         else:
             return X, y.astype(np.float32)
+# ----------------------------------------------------------------------------------------------------------------------

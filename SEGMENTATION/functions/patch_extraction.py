@@ -1,14 +1,14 @@
-'''
+"""
 @Author  :   <Nolann Lainé>
 @Contact :   <nolann.laine@outlook.fr>
-'''
+"""
 
 import numpy as np
 import cv2
 import _io
 
 def patch_preprocessing(patch: np.ndarray):
-    ''' Spread grayscale values in the interval [0, 255]. '''
+    """ Spread grayscale values in the interval [0, 255]. """
     min_ = np.min(patch)
     patch=(patch-min_)
     max_ = np.max(patch)
@@ -30,7 +30,7 @@ def patch_extraction_wall(img: np.ndarray,
                           desired_spatial_res: int,
                           img_nb: int):
 
-    ''' Extracts patches (mask and image), and write skipped images in .txt. An image is skipped if its annotation is done on less than width_window. '''
+    """ Extracts patches (mask and image), and write skipped images in .txt. An image is skipped if its annotation is done on less than width_window. """
     # --- get information
     dim = img.shape
     left_border = borders[0]
@@ -140,14 +140,14 @@ def patch_extraction_far_wall(img,
                               spatial_res_x,
                               img_nb):
 
-    ''' TODO '''
+    """ Extract full-height and width_window width in the ROI defined by experts. """
 
     dim = img.shape
     leftB = borders[0]   # this is not a constant\fancyfoot[C]{}
     rightB = borders[1]  # this is a constant
 
     height_i = 512
-    scaleCoef = height_i/dim[0]
+    scale_coef = height_i/dim[0]
     width_i = dim[1]
 
     condition = True
@@ -167,9 +167,9 @@ def patch_extraction_far_wall(img,
 
         while condition:
 
-            LItmp = LI[leftB:leftB + width_window]
-            MAtmp = MA[leftB:leftB + width_window]
-            middlePos = scaleCoef*(LItmp + MAtmp)/2
+            LI_ = LI[leftB:leftB + width_window]
+            MA_ = MA[leftB:leftB + width_window]
+            middlePos = scale_coef*(LI_ + MA_)/2
 
             patch_img = img[:, leftB:leftB + width_window]
             tmpMin = np.min(patch_img)
@@ -185,7 +185,7 @@ def patch_extraction_far_wall(img,
 
             dic_datas['patch_mask']['patch_'+ str(inc) + "_" + name_seq] = patch_mask.astype(np.uint8)
             dic_datas['patch_Image_org']['patch_'+ str(inc) + "_" + name_seq] = patch_img.astype(np.uint8)
-            dic_datas['spatial_resolution']['patch_'+ str(inc) + "_" + name_seq] = np.asarray([spatial_res_x, spatial_res_y/scaleCoef])
+            dic_datas['spatial_resolution']['patch_'+ str(inc) + "_" + name_seq] = np.asarray([spatial_res_x, spatial_res_y/scale_coef])
 
             inc+=1
             img_nb+=1

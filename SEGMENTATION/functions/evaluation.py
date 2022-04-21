@@ -198,13 +198,6 @@ def compute_metric_FW_MAE(patient, pred, IFC3, IFC4, borders, set, p):
 
         cv2.imwrite(os.path.join(p.PATH_WALL_SEGMENTATION_RES, 'EVALUATION', "FW_OUTLIERS", set + '_' + patient + ".jpg"), img)
 
-        # --- uncomment to save the metrics; but only the image is useful for visual inspection.
-        # err = open(os.path.join(p.PATH_TO_RES, , patient + ".txt"), 'w+')
-        # err.write("max distance by column: " + str(metric.max()) + "\n")
-        # err.write("average distance by column: " + str(metric.mean()) + "\n")
-        # err.write("std average distance by column: " + str(metric.std()) + "\n")
-        # err.close
-
     return metric
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 
 The presented GIT is a demonstration of the developed algorithm and can be used as a public benchmark. It uses a convolutional neural network (_CNN_) named Dilated U-net, which aims to segment the intima-media complex (_IMC_) of the common carotid artery (_CCA_). Any advanced user can easily add their own architectures for training and evaluation. The repository provides codes to:
-* generate the dataset using the <a href="https://data.mendeley.com/datasets/fpv535fss7/1">CUBS database</a> ;
+* generate the dataset using the <a href="https://data.mendeley.com/datasets/fpv535fss7/1">CUBS database</a>;
 * train a model for far wall (_FW_) detection;
 * train a model for _IMC_ segmentation;
 * _FW_ detection;
