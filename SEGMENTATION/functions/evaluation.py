@@ -14,9 +14,10 @@ def read_fold(path):
         patients[k] = patients[k].split('.')[0]
 
     return patients
+
 # ----------------------------------------------------------------------------------------------------------------------
 def load_prediction_IMC(patient_name, path, img_width):
-    ''' Load IMC prediction. '''
+    """ Load IMC prediction. """
 
     IFC3_pred = open(os.path.join(path, patient_name + "-LI.txt"), "r")
     IFC3 = IFC3_pred.readlines()
@@ -43,19 +44,22 @@ def load_prediction_IMC(patient_name, path, img_width):
         IFC4_np[k] = IFC4[k-left_border].split('\n')[0].split(' ')[-1]
 
     return IFC3_np, IFC4_np, {'left_border': left_border, 'right_border': right_border}
+
 # ----------------------------------------------------------------------------------------------------------------------
 def load_annotation(path, patient, expert_name):
-    ''' Load experts' annotation. '''
+    """ Load experts' annotation. """
     IFC3 = scipy.io.loadmat(os.path.join(path, expert_name, patient + "_IFC3_" + expert_name + ".mat"))['seg'][:,0]
     IFC4 = scipy.io.loadmat(os.path.join(path, expert_name, patient + "_IFC4_" + expert_name + ".mat"))['seg'][:,0]
 
     return IFC3, IFC4
+
 # ----------------------------------------------------------------------------------------------------------------------
 def read_CF_directory(path):
-    '''Read calibration factor. '''
+    """Read calibration factor. """
     f = open(path, "r")
     val = f.readline().split(' \n')
     return float(val[0])
+
 # ----------------------------------------------------------------------------------------------------------------------
 def get_border_expert(IFC3, IFC4):
 
@@ -88,6 +92,7 @@ def get_border_expert(IFC3, IFC4):
         right_border = right_border_3
 
     return {'left_border': left_border, 'right_border': right_border}
+
 # ----------------------------------------------------------------------------------------------------------------------
 def compute_metric_wall_MAE(patient: str, prediction: dict, expert: dict, borders_ROI: dict, set: str, p, save_outlier= False):
 
@@ -144,6 +149,7 @@ def compute_metric_wall_MAE(patient: str, prediction: dict, expert: dict, border
         err.close
 
     return LI_MAE, MA_MAE, IMT_MAE
+
 # ----------------------------------------------------------------------------------------------------------------------
 def compute_metric_wall_DICE(patient: str, prediction: dict, expert: dict, borders_ROI: dict, p):
 
@@ -165,6 +171,7 @@ def compute_metric_wall_DICE(patient: str, prediction: dict, expert: dict, borde
     print("DICE: ", dice)
 
     return dice
+
 # ----------------------------------------------------------------------------------------------------------------------
 def compute_metric_FW_MAE(patient, pred, IFC3, IFC4, borders, set, p):
 
@@ -199,6 +206,7 @@ def compute_metric_FW_MAE(patient, pred, IFC3, IFC4, borders, set, p):
         # err.close
 
     return metric
+
 # ----------------------------------------------------------------------------------------------------------------------
 def load_prediction_FW(patientName: str, path: str):
 
@@ -216,9 +224,10 @@ def load_prediction_FW(patientName: str, path: str):
             right_border=int(prediction[k].split('\n')[0].split(' ')[0])
     pred=np.concatenate((np.zeros(left_border), pred))
     return pred, {'left_border': left_border, 'right_border': right_border}
+
 # ----------------------------------------------------------------------------------------------------------------------
 def get_narrow_borders(borders_expert, borders_pred):
-    ''' Get the intersection border. '''
+    """ Get the intersection border. """
 
     left_border_r=max(borders_expert['left_border'], borders_pred['left_border'])
     right_border_r=min(borders_expert['right_border'], borders_pred['right_border'])
@@ -226,3 +235,4 @@ def get_narrow_borders(borders_expert, borders_pred):
     borders_roi={'left_border': left_border_r,'right_border': right_border_r}
 
     return borders_roi
+# ----------------------------------------------------------------------------------------------------------------------
