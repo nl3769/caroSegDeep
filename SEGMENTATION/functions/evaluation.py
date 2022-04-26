@@ -59,7 +59,7 @@ def read_CF_directory(path):
     f = open(path, "r")
     val = f.readline().split(' \n')
 
-return float(val[0])
+    return float(val[0])
 
 # ----------------------------------------------------------------------------------------------------------------------
 def get_border_expert(IFC3, IFC4):

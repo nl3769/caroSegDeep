@@ -70,15 +70,25 @@ def save_image(p, seq, patient):
 if __name__ == '__main__':
 
 
-
     # --- using a parser with set_parameters.py allows us to run several process with different set_parameters.py with the cluster
     my_parser = argparse.ArgumentParser(description='Name of set_parameters_*.py')
     my_parser.add_argument('--Parameters', '-param', required=True, help='List of parameters required to execute the code.')
+    my_parser.add_argument('--fold', '-fold', type=str)
+    my_parser.add_argument('--overlap', '-overlap', type=int)
+
+
+
     arg = vars(my_parser.parse_args())
     param = importlib.import_module('parameters.' + arg['Parameters'].split('.')[0])
 
     # --- we get parameters
     p = param.setParameters()
+
+    p.OVERLAPPING = arg['overlap']
+    p.PATH_TO_FOLDS = os.path.join(p.PATH_TO_FOLDS, arg['fold'])
+
+
+    p.PATH_TO_LOAD_TRAINED_MODEL_WALL = os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL + arg['fold'].split('f')[-1], 'EXAMPLE')
 
     # --- get image name
     patient_name_list = os.listdir(p.PATH_TO_SEQUENCES)
@@ -97,9 +107,11 @@ if __name__ == '__main__':
               "patch_height": p.PATCH_HEIGHT,
               "patch_width": p.PATCH_WIDTH,
               "overlapping": p.OVERLAPPING,
-              "fold": "fold2"}
+              "inference": "IMC",
+              "training": False,
+              "fold": arg['fold']}
 
-    wandb.init(project="caroSegDeepInference", entity="nl37", dir=p.PATH_WALL_SEGMENTATION_RES, config=config, name='overlapping_32_fold2')
+    wandb.init(project="caroSegDeep", entity="nl37", dir=p.PATH_WALL_SEGMENTATION_RES, config=config, name='IMC_inference_shift_' + str(arg['overlap']) + '_' + arg['fold'])
     # wandb.init = (config)
 
     # --- store metrics
@@ -124,7 +136,7 @@ if __name__ == '__main__':
 
         # --- launch the segmentation
         t = time.time()
-        seq.sliding_window_vertical_scan()
+        postprocess_time = seq.sliding_window_vertical_scan()
         elapsed = time.time() - t
 
         # --- save execution timer and number of patches
@@ -148,11 +160,15 @@ if __name__ == '__main__':
                    "MAE_LI": np.mean(MAE_LI_),
                    "MAE_MA": np.mean(MAE_MA_),
                    "nb_patches": len(seq.predictionClass.patches),
-                   "exec_time": elapsed})
+                   "exec_time (full)": elapsed,
+                    "exec_time (postprocess)": postprocess_time})
 
     wandb.log({"MAE_IMT_full": np.mean(IMT_MAE),
+               "MAE_IMT_std_full": np.std(IMT_MAE),
                "MAE_LI_full": np.mean(LI_MAE),
-               "MAE_MA_full": np.mean(MA_MAE)})
+               "MAE_LI_std_full": np.std(LI_MAE),
+               "MAE_MA_full": np.mean(MA_MAE),
+               "MAE_MA_std_full": np.std(MA_MAE)})
 
     exec_time.close()
     nb_patches.close()

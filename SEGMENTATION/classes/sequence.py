@@ -135,15 +135,18 @@ class sequenceClassIMC():
             self.predictionClass.prediction_masks(id=frame_ID, pos={"min": min_y, "max": max_y+self.patch_height})
 
             mask_ = self.predictionClass.map_prediction[str(frame_ID)]["prediction"]
+            t = time.time()
             mask_tmp = self.annotationClass.update_annotation(previous_mask=mask_,
                                                               frame_ID=frame_ID + 1,
                                                               offset=self.predictionClass.map_prediction[str(frame_ID)]["offset"]).copy()
             mask_tmp_height = mask_tmp.shape[0]
             # --- for display only
             self.final_mask_after_post_processing[self.predictionClass.map_prediction[str(frame_ID)]["offset"]:self.predictionClass.map_prediction[str(frame_ID)]["offset"]+mask_tmp_height,:] = mask_tmp
+            postprocess_time = time.time() - t
 
-        exec_t = time.time() - t
-        print("execution time: ", exec_t)
+        return postprocess_time
+        # exec_t = time.time() - t
+        # print("execution time: ", exec_t)
 
     # ------------------------------------------------------------------------------------------------------------------
     def initialization_step(self):

@@ -9,7 +9,7 @@ import os
 
 from caroSegDeepBuildModel.KerasSegmentationFunctions.losses import *
 from caroSegDeepBuildModel.KerasSegmentationFunctions.models.custom_dilated_unet import custom_dilated_unet
-
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 class predictionClassIMC():
 
     """ The prediction class contains the trained architecture and performs the following calculations:
