@@ -58,7 +58,7 @@ class annotationClassIMC():
         self.overlay = overlay
         self.seq_dimension = dimension
         self.borders_ROI = {}
-        pos, _, borders_seg, borders_ROI = self.get_far_wall(img=first_frame, patient_name=patient_name, p=p)
+        pos, borders_seg, borders_ROI = self.get_far_wall(img=first_frame, patient_name=patient_name, p=p)
         self.borders = {"leftBorder": borders_seg[0], "rightBorder": borders_seg[1]}
         self.borders_ROI = {"leftBorder": borders_ROI[0], "rightBorder": borders_ROI[1]}
         self.initialization(localization=pos, scale=scale)
@@ -85,8 +85,8 @@ class annotationClassIMC():
         # --- window of +/- neighbours pixels where the algorithm searches the borders
         neighours = 30  
         # --- the algorithm starts from the left to the right
-        x_start = self.borders_ROI['leftBorder']
-        x_end = self.borders_ROI['rightBorder']
+        x_start = self.borders['leftBorder']
+        x_end = self.borders['rightBorder']
         # --- dimension of the mask
         dim = previous_mask.shape
         # --- we extract the biggest connected region
@@ -122,7 +122,7 @@ class annotationClassIMC():
             borders_ROI = [np.min(borders), np.max(borders)]
 
 
-            return FW_pred, '', borders_ROI, borders_ROI
+            return FW_pred, borders_ROI, borders_ROI
         else:
             """ GUI with openCV with spline interpolation to localize the far wall. """
             image = np.zeros(img.shape + (3,))
@@ -130,7 +130,14 @@ class annotationClassIMC():
             image[:, :, 1] = img.copy()
             image[:, :, 2] = img.copy()
             coordinateStore = cv2Annotation("Far wall manual detection", image.astype(np.uint8))
-            return coordinateStore.getpt()
+            pos = coordinateStore.getpt()
+
+            borders_seg = pos[3]
+            borders_ROI = pos[2]
+            fw_approx = np.zeros(img.shape[1])
+            fw_approx[borders_seg[0]:borders_seg[1]] = pos[0]
+
+            return fw_approx, borders_seg, borders_ROI
 
     # ------------------------------------------------------------------------------------------------------------------
     def IMT(self):

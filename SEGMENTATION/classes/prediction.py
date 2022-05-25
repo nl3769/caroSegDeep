@@ -102,7 +102,7 @@ class predictionClassIMC():
 
         return patches
 
- # ---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 class predictionClassFW():
 
     def __init__(self, dimensions, p, img = None):
@@ -113,7 +113,7 @@ class predictionClassFW():
         self.patch_width = p.PATCH_WIDTH
         self.patches = []
         self.img = img
-        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, p.MODEL_NAME_FW))
+        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_FW, p.MODEL_NAME))
 
     # ------------------------------------------------------------------------------------------------------------------
     def prediction_masks(self):

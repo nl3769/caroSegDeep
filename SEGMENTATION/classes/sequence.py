@@ -43,8 +43,9 @@ class sequenceClassIMC():
     # ------------------------------------------------------------------------------------------------------------------
     def sliding_window_vertical_scan(self):
         """ At each position, three patches are extracted, and if the difference between the min and the max then the vertical scanning is automatically adjusted. """
+
         condition = True
-        t = time.time()
+
         for frame_ID in range(self.sequence.shape[0]):
             self.current_frame = frame_ID
             self.predictionClass.patches = []
@@ -68,6 +69,7 @@ class sequenceClassIMC():
                                                               height=self.patch_height,
                                                               map=self.annotationClass.map_annotation[frame_ID,])
                 y_pos = y_mean
+
                 # --- by default, we take three patches for a given position x. If this is not enough, the number of patches is dynamically adjusted.
                 if 768 > 2*100 + median_max-median_min:
                     self.predictionClass.patches.append({"patch": self.extract_patch(x, y_pos, image = self.sequence[frame_ID,]),
@@ -75,6 +77,7 @@ class sequenceClassIMC():
                                                          "Step": self.step,
                                                          "Overlay": overlay_,
                                                          "(x, y)": (x, y_pos)})
+
                     y_pos_list.append(self.predictionClass.patches[-1]["(x, y)"][-1])
                     if y_mean - 128 > 0:
                         y_pos = y_mean + 128
@@ -145,8 +148,6 @@ class sequenceClassIMC():
             postprocess_time = time.time() - t
 
         return postprocess_time
-        # exec_t = time.time() - t
-        # print("execution time: ", exec_t)
 
     # ------------------------------------------------------------------------------------------------------------------
     def initialization_step(self):
