@@ -11,6 +11,7 @@ import numpy as np
 from functions.load_datas import load_borders, load_tiff, load_annotation, get_files
 from functions.patch_extraction import patch_extraction_wall, patch_extraction_far_wall
 from functions.split_data import split_data_fold
+from functions.folder_handler import make_dir
 
 def write_unseen_images(pres: str, substr: str, pimg: str, keys: list):
     """ Write images that cannot be used for training in .txt file. """
@@ -112,11 +113,14 @@ class datasetBuilderFarWall():
         self.im_nb = 0
         self.p = p
 
+        # --- create directory
+        make_dir(p.PATH_TO_SKIPPED_SEQUENCES)
+        make_dir(p.PATH_TO_SAVE_DATASET)
     # ------------------------------------------------------------------------------------------------------------------
     def build_data(self):
         """ build_data computes and write the dataset in .h5 file. The h5 contains training, validation and validation set. """
 
-        skipped_sequences=open(os.path.join(self.p.PATH_TO_SKIPPED_SEQUENCES, "skipped_sequences.txt"), "w") # contains images that cannot be incorporated into the data set
+        skipped_sequences = open(os.path.join(self.p.PATH_TO_SKIPPED_SEQUENCES, "skipped_sequences.txt"), "w") # contains images that cannot be incorporated into the data set
         # --- loop is required if more than one database is used. It not necessary for CUBS
         for data_base in self.p.DATABASE_NAME:
             files_cubs = get_files(self.p.PATH_TO_SEQUENCES) # name of all images in self.p.PATH_TO_SEQUENCES
