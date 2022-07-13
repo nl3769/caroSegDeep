@@ -45,8 +45,8 @@ while size(names_patient, 2)>1
     image=loadData.load_image(image_name);
     % --- we modify the image
     image=modify_image(LI_int_A1, MA_int_A1, LI_A1, MA_A1, image, 'A1');
-    image=modify_image(LI_int_A1_bis, MA_int_A1_bis, LI_A1_bis, MA_A1_bis, image, 'A1_bis');
-    image=modify_image(LI_int_A2, MA_int_A2, LI_A2, MA_A2, image, 'A2');
+%     image=modify_image(LI_int_A1_bis, MA_int_A1_bis, LI_A1_bis, MA_A1_bis, image, 'A1_bis');
+%     image=modify_image(LI_int_A2, MA_int_A2, LI_A2, MA_A2, image, 'A2');
     % --- we compute the union and the intersection
     left_border = [borders_A2.border_left, borders_A1_bis.border_left, borders_A1.border_left];
     right_border = [borders_A2.border_right, borders_A1_bis.border_right, borders_A1.border_right];
