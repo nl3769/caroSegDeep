@@ -11,10 +11,10 @@ The presented GIT is a demonstration of the developed algorithm and can be used 
 
 All parameters are set in:
 * _**CREATE_REFERENCES_CUBS/set_parameters.m**_: parameters to interpolate images from control points;
-* _**SEGMENTATION/parameters/set_parameters_dataset_template.py**_: parameters to generate the dataset;
-* _**SEGMENTATION/set_parameters_caro_seg_deep_training_template.py**_ parameters to train the neural network for _IMC_ segmentation;
-* _**SEGMENTATION/set_parameters_far_wall_training_template.py**_ parameters to train the neural network for far wall detection.
-* _**SEGMENTATION/parameters/set_parameters_inference_template.py**_: parameters to segment the image.
+* _**SEGMENTATION/package_parameters/set_parameters_dataset_template.py**_: parameters to generate the dataset;
+* _**SEGMENTATION/package_parameters/set_parameters_caroSegDeepTraining_template.py**_ parameters to train the neural network for _IMC_ segmentation;
+* _**SEGMENTATION/package_parameters/set_parameters_farWallTraining_template.py**_ parameters to train the neural network for far wall detection.
+* _**SEGMENTATION/parameters/package_parameters/set_parameters_inference_template.py**_: parameters to segment the image.
 
 More details on the method and results of this database are available here: <a href="https://arxiv.org/abs/2201.12152">Carotid artery wall segmentation in ultrasound image sequences using a deep convolutional neural network</a>.
 
@@ -64,7 +64,7 @@ You can easily change the interpolation method in the class _`CREATE_REFERENCES_
 
 # How to create the datasets?
 
-Two datasets are needed to train both models _i_) _FW_ detection _ii_) _IMC_ segmentation. Those datasets will be stored in _.h5_ file, named _CUBS_wall.h5_ and _CUBS_far_wall.h5_. To do that, fill in the variables according to your path tree in: **_SEGMENTATION/parameters/set_parameters_dataset_template.py_**.  
+Two datasets are needed to train both models _i_) _FW_ detection _ii_) _IMC_ segmentation. Those datasets will be stored in _.h5_ file, named _CUBS_wall.h5_ and _CUBS_far_wall.h5_. To do that, fill in the variables according to your path tree in: **_SEGMENTATION/package_parameters/set_parameters_dataset_template.py_**.  
 Then run **_RUN/run_dataset.sh_**. The size of the generated datasets are 24.4Go (for _IMC_ segmentation) and 8.1Go (for _FW_ detection).
 
 # How to train the models?
@@ -90,8 +90,8 @@ The parameters are common for both codes, thus fill in according to your path th
 **_caroSegDeep/SEGMENTATION/parameters/set_parameters_inference_template.py_**.  
 
 ## How to detect the far wall?
-To run the _FW_ detection, modify the working directory in _**RUN/run_IMC_segmentation.sh**_ and run:  
-`bash RUN/run_IMC_segmentation.sh`  
+To run the _FW_ detection, modify the working directory in _**RUN/run_FW_detection.sh**_ and run:  
+`bash RUN/run_FW_detection.sh`  
 
 The script uses the previous trained model named _CUBS_far_wall.h5_. If you do not train the model, you can download a pretrained one by clicking <a href="https://www.dropbox.com/s/a31pg75ejsiepa2/FW_custom_dilated_unet.h5?dl=0">here</a>:  then copy it in **_EXAMPLE/TRAINED_MODEL_**.
 Two results are saved:  
