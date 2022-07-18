@@ -107,8 +107,6 @@ class dataGenerator(tensorflow.keras.utils.Sequence):
         for i, ID in enumerate(list_IDs_temp):
 
             # --- Store sample
-            print(self.data[ID[0][0]]['img'][ID[1][0]][()].shape)
-
             X[i, ] = self.data[ID[0][0]]['img'][ID[1][0]][()].reshape(self.dim)
 
             # --- Store class

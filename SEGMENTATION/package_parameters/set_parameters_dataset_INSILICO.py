@@ -23,7 +23,9 @@ def setParameters():
   print('----------------------------------------------------------------')
 
   # --- Save a backup of the package_parameters so it can be tracked on Git, without requiring to be adapted by from other contributors
-  copyfile(os.path.join('package_parameters', os.path.basename(__file__)), os.path.join('package_parameters', 'get_parameters_dataset.py'))
+  chek_dir(os.path.join(p.PATH_TO_SKIPPED_SEQUENCES, "parameters"))
+  copyfile(os.path.join('package_parameters', os.path.basename(__file__)),
+           os.path.join(p.PATH_TO_SKIPPED_SEQUENCES, "parameters", 'get_parameters_training.py'))
 
   # --- Create dir
   chek_dir(p.PATH_TO_SAVE_DATASET)

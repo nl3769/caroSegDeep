@@ -17,14 +17,15 @@ if __name__ == '__main__':
     arg = vars(my_parser.parse_args())
     param = importlib.import_module('package_parameters.' + arg['Parameters'].split('.')[0])
 
-    # --- we get package_parameters
+    # --- get package_parameters
     p = param.setParameters()
-    # --- we run the training
+    
+    # --- run the training
     train(p)
 
-    # --- we run the metrics on train set
+    # --- run the metrics on train set
     test(p, set='training')
-    # --- we run the metrics on validation set
+    # --- run the metrics on validation set
     test(p, set='validation')
-    # --- we run the metrics on test set
+    # --- run the metrics on test set
     test(p, set='test')

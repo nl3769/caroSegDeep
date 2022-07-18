@@ -70,8 +70,7 @@ def train(p):
     # --- path to save tensorboard
     log_dir_tensorboard = os.path.join(p.PATH_TO_SAVE_TENSORBOARD, p.MODEL_SELECTION + "_" + p.NAME_OF_THE_EXPERIMENT + "_" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
     # --- callbacks
-    my_callbacks = [ModelCheckpoint(model_filename, verbose=0, save_best_only=False, save_weights_only=True),
-                    #ModelCheckpoint(model_filename, verbose=1, monitor='val_loss', save_best_only=True, save_weights_only=True),
+    my_callbacks = [ModelCheckpoint(model_filename, verbose=1, monitor='val_loss', save_best_only=True, save_weights_only=True),
                     EarlyStopping(monitor='val_loss', patience=p.NBPATIENCE_EPOCHS),
                     TensorBoard(log_dir=log_dir_tensorboard),
                     CustomLearningRateScheduler(schedule=lr_schedule)]

@@ -12,10 +12,11 @@ from medpy.metric.binary import dc, hd
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-from package_utils.utils import plot_org_gt_pred
-from package_utils.metrics import iou, dice_coef
-from package_network.model_selection import *
-from package_dataset.data_generator import dataGenerator
+from package_utils.utils                    import plot_org_gt_pred
+from package_utils.metrics                  import iou, dice_coef
+from package_network.model_selection        import *
+from package_dataset.data_generator         import dataGenerator
+from package_loss.losses                    import dice_bce_loss, dice_bce_constraint_MAE
 
 # ----------------------------------------------------------------
 def test(p, set):

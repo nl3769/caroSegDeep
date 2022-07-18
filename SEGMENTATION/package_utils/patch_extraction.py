@@ -61,9 +61,10 @@ def patch_extraction_wall(img: np.ndarray,
     stop_ = True # variable used to stop the extraction
     if (right_border - left_border) >= width_window:
 
-        for i in range(left_border, right_border):
-            img[int(LI[i]), i] = 255
-            img[int(MA[i]), i] = 255
+        # for i in range(left_border, right_border):
+        #     img[int(LI[i]), i] = 255
+        #     img[int(MA[i]), i] = 255
+
         # --- dictionary that contains the data
         dic_datas = {'patch_mask': {},
                      'patch_Image_org': {},
