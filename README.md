@@ -139,7 +139,7 @@ Then the algorithm stores the segmentation result in **_.txt_** format for both 
 <p>
 
 # Evaluation
-
+For evaluation run `bash RUN/run_evaluation.sh`. 
 Potential outliers for _FW_ detection are detected and saved in:  
 _**EXAMPLE/RESULTS/INFERENCE/EVALUATION/FW_OUTLIERS**_  
   
