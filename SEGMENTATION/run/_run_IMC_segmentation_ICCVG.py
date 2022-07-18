@@ -146,27 +146,26 @@ if __name__ == '__main__':
 
         # --- compute metrics
         MAE_IMT_, MAE_LI_, MAE_MA_ = compute_metrics_IMC(
-            p.PATH_TO_LOAD_GT,
-            patientName,
-            'A1',
+            p.PATH_LO_LOAD_GT,
+            patientName, 'A1',
             seq.annotationClass.map_annotation[1, ] / seq.scale,
             p)
         LI_MAE = np.concatenate((LI_MAE, MAE_LI_))
         MA_MAE = np.concatenate((MA_MAE, MAE_MA_))
         IMT_MAE = np.concatenate((IMT_MAE, MAE_IMT_))
 
-    #     wandb.log({
-    #         "Patient": patientName.split('.')[0],
-    #        "MAE_IMT": np.mean(MAE_IMT_),
-    #        "MAE_LI": np.mean(MAE_LI_),
-    #        "MAE_MA": np.mean(MAE_MA_),
-    #        "nb_patches": len(seq.predictionClass.patches),
-    #        "exec_time": elapsed})
-    #
-    # wandb.log({
-    #     "MAE_IMT_full": np.mean(IMT_MAE),
-    #    "MAE_LI_full": np.mean(LI_MAE),
-    #    "MAE_MA_full": np.mean(MA_MAE)})
+        wandb.log({
+            "Patient": patientName.split('.')[0],
+           "MAE_IMT": np.mean(MAE_IMT_),
+           "MAE_LI": np.mean(MAE_LI_),
+           "MAE_MA": np.mean(MAE_MA_),
+           "nb_patches": len(seq.predictionClass.patches),
+           "exec_time": elapsed})
+
+    wandb.log({
+        "MAE_IMT_full": np.mean(IMT_MAE),
+       "MAE_LI_full": np.mean(LI_MAE),
+       "MAE_MA_full": np.mean(MA_MAE)})
 
     exec_time.close()
     nb_patches.close()

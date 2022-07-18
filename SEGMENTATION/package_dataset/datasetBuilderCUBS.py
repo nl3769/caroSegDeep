@@ -67,7 +67,8 @@ class datasetBuilderIMC():
     def build_data(self):
         """ build_data computes and write the dataset in .h5 file. The h5 contains training, validation and validation set. """
 
-        skipped_sequences=open(os.path.join(self.p.PATH_TO_SKIPPED_SEQUENCES, "skipped_sequences.txt"), "w") # contains images that cannot be incorporated into the data set
+        # --- contains images that cannot be incorporated into the data set (if the experts' annotation is not large enough)
+        skipped_sequences = open(os.path.join(self.p.PATH_TO_SKIPPED_SEQUENCES, "skipped_sequences.txt"), "w")
         # --- loop is required if more than one database is used. It not necessary for CUBS
         for data_base in self.p.DATABASE_NAME:
             files_cubs = get_files(self.p.PATH_TO_SEQUENCES) # name of all images in self.p.PATH_TO_SEQUENCES

@@ -38,14 +38,15 @@ def setParameters():
   print('\n'.join("%s: %s" % item for item in attrs.items()))
   print('----------------------------------------------------------------')
 
-  # --- Save a backup of the package_parameters so it can be tracked on Git, without requiring to be adapted by from other contributors
+  # --- Create dir
   chek_dir(os.path.join(p.PATH_TO_SKIPPED_SEQUENCES, "parameters"))
+  chek_dir(p.PATH_TO_SAVE_DATASET)
+  chek_dir(p.PATH_TO_SKIPPED_SEQUENCES)
+
+  # --- Save a backup of the package_parameters
   copyfile(os.path.join('package_parameters', os.path.basename(__file__)),
            os.path.join(p.PATH_TO_SKIPPED_SEQUENCES, "parameters", 'get_parameters_training.py'))
 
-  # --- Create dir
-  chek_dir(p.PATH_TO_SAVE_DATASET)
-  chek_dir(p.PATH_TO_SKIPPED_SEQUENCES)
 
   # --- Return populated object from Parameters class
   return p

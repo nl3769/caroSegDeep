@@ -131,6 +131,7 @@ class annotationClassIMC():
                 image = np.zeros(img.shape[1:] + (3,))
                 I_ = img[1,:,:]
             else:
+                I_ = img
                 image = np.zeros(img.shape + (3,))
 
             image[:, :, 0] = I_.copy()

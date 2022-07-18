@@ -6,7 +6,7 @@
 import numpy as np
 import os
 
-from caroSegDeepBuildModel.KerasSegmentationFunctions.models.custom_dilated_unet import custom_dilated_unet
+from package_network.custom_dilated_unet        import custom_dilated_unet
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 class predictionClassIMC():
 
@@ -26,7 +26,7 @@ class predictionClassIMC():
         self.map_overlay, self.map_prediction = {}, {}      # dictionaries evolve during the inference phase
         self.img = img
 
-        self.model = self.load_model(os.path.join(p.PATH_TO_LOAD_TRAINED_MODEL_WALL, p.MODEL_NAME))
+        self.model = self.load_model(p.PATH_MODEL_WALL)
 
     # ------------------------------------------------------------------------------------------------------------------
     def prediction_masks(self, id: int, pos: dict):
@@ -70,17 +70,18 @@ class predictionClassIMC():
     def load_model(self, model_name: str):
         """ Loads the trained architecture. """
 
-        model = custom_dilated_unet(input_shape=(512, 128, 1),
-                                    mode='cascade',
-                                    filters=32,
-                                    kernel_size=(3, 3),
-                                    n_block=3,
-                                    n_pool_col=2,
-                                    n_class=1,
-                                    output_activation='sigmoid',
-                                    SE=None,
-                                    kernel_regularizer=None,
-                                    dropout=0.2)
+        model = custom_dilated_unet(
+            input_shape=(512, 128, 1),
+            mode='cascade',
+            filters=32,
+            kernel_size=(3, 3),
+            n_block=3,
+            n_pool_col=2,
+            n_class=1,
+            output_activation='sigmoid',
+            SE=None,
+            kernel_regularizer=None,
+            dropout=0.2)
 
         model.load_weights(model_name)
         return model

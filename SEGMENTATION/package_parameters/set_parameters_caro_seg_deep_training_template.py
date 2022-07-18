@@ -21,19 +21,19 @@ def setParameters():
     PATCH_WIDTH                                       = 128,                                                               # The width of a patch
 
     # --- relative to results
-    PATH_TO_SAVE_TENSORBOARD                          = '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/IN_SILICO//'
+    PATH_TO_SAVE_TENSORBOARD                          = '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/IN_SILICO/'
                                                         'FINE_TUNING/TENSORBOARD/',                                        # path to save tensorboard
-    PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS          = '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/IN_SILICO//'
+    PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS          = '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/IN_SILICO/'
                                                         'FINE_TUNING/RES/',                                                # where metrics/pdf are saved
     NAME_OF_THE_EXPERIMENT                            = 'FINE_TUNING',
 
     # For fine tuning
-    PATH_PRETRAINED_MODEL                             = '/home/laine/cluster/PROJECTS_IO/SEGMENTATION//'
-                                                        'CONSORTIUM_MEIBURGER/CARO_SEG_DEEP/RESULTS//'
+    PATH_PRETRAINED_MODEL                             = '/home/laine/cluster/PROJECTS_IO/SEGMENTATION/'
+                                                        'CONSORTIUM_MEIBURGER/CARO_SEG_DEEP/RESULTS/'
                                                         'prediction_results/f0_MEIBURGER_01/custom_dilated_unet.h5',      # path to lad pretrained model
 
     # --- relative to data
-    PATH_TO_DATASET                                   = '/home/laine/Documents/PROJECTS_IO/SEGMENTATION//'
+    PATH_TO_DATASET                                   = '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/'
                                                         'IN_SILICO/DATASET/SILICO_wall.h5',                               # Path where dataset in .h5 is saved
     PATH_FOLD                                         ={ \
       'training'   : '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/IN_SILICO/DATASET/set/training_patients.txt',

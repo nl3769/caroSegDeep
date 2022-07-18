@@ -9,7 +9,9 @@ from tensorflow.keras.optimizers import RMSprop
 import numpy as np
 
 # --------------------------------------------------------
-def squeeze_excitation(input, r):
+def squeeze_excitation(
+        input,
+        r):
     size_conv = input.shape  # 5 features maps (50*50)
 
     pooling = GlobalAveragePooling2D()(input)  # (1*1*5)
@@ -27,7 +29,16 @@ def squeeze_excitation(input, r):
     return input * excitation
 
 # --------------------------------------------------------
-def encoder(x, filters=44, n_block=3, kernel_size=(3, 3), activation='relu', n_pool_col = 2, SE = True, kernel_regularizer=None, dropout=None):
+def encoder(
+        x,
+        filters=44,
+        n_block=3,
+        kernel_size=(3, 3),
+        activation='relu',
+        n_pool_col = 2,
+        SE = True,
+        kernel_regularizer=None,
+        dropout=None):
     skip = []
     skip_pool_col = []
 
@@ -63,7 +74,15 @@ def encoder(x, filters=44, n_block=3, kernel_size=(3, 3), activation='relu', n_p
     return x, skip, skip_pool_col
 
 # --------------------------------------------------------
-def bottleneck(x, filters_bottleneck, mode='cascade', depth=6, kernel_size=(3, 3), activation='relu', kernel_regularizer = None, dropout=None):
+def bottleneck(
+        x,
+        filters_bottleneck,
+        mode='cascade',
+        depth=6,
+        kernel_size=(3, 3),
+        activation='relu',
+        kernel_regularizer = None,
+        dropout=None):
     dilated_layers = []
     dil_f = [1, 2, 3, 4, 5, 6]  # this is for dilated unet
 
@@ -83,7 +102,18 @@ def bottleneck(x, filters_bottleneck, mode='cascade', depth=6, kernel_size=(3, 3
     return add(dilated_layers)
 
 # --------------------------------------------------------
-def decoder(x, skip, skip_pool_col, filters, n_block=3, kernel_size=(3, 3), activation='relu', n_pool_col = 2, SE = True, kernel_regularizer = None, dropout=None):
+def decoder(
+        x,
+        skip,
+        skip_pool_col,
+        filters,
+        n_block=3,
+        kernel_size=(3, 3),
+        activation='relu',
+        n_pool_col = 2,
+        SE = True,
+        kernel_regularizer = None,
+        dropout=None):
 
     for i in reversed(range(n_block)):
         x = UpSampling2D(size=(2, 2))(x)
@@ -123,17 +153,18 @@ def decoder(x, skip, skip_pool_col, filters, n_block=3, kernel_size=(3, 3), acti
     return x
 
 # --------------------------------------------------------
-def custom_dilated_unet(input_shape,
-                        mode,
-                        filters,
-                        kernel_size,
-                        n_block,
-                        n_pool_col,
-                        n_class,
-                        output_activation,
-                        SE = False,
-                        kernel_regularizer = None,
-                        dropout = None):
+def custom_dilated_unet(
+        input_shape,
+        mode,
+        filters,
+        kernel_size,
+        n_block,
+        n_pool_col,
+        n_class,
+        output_activation,
+        SE = False,
+        kernel_regularizer = None,
+        dropout = None):
 
 
     inputs = Input(input_shape)

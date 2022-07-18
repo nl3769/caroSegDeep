@@ -26,7 +26,7 @@ def plot_org_gt_pred(org: np.ndarray,
     if not( OutputPDF is None):
         plt.savefig(OutputPDF, dpi=150)
 
-    plt.show()
+    plt.close()
 
 def get_cmap(arr: np.ndarray):
     if arr.ndim == 3:

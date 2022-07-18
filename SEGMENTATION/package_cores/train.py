@@ -30,7 +30,7 @@ def train(p):
     # --- get dataset
     data = h5py.File(p.PATH_TO_DATASET, 'r')
     # --- package_parameters for training generator
-    params_training = {
+    params_training = { \
         'partitions': data,
         'keys': ["img", "masks"],
         'pfold': p.PATH_FOLD['training'],
@@ -38,7 +38,7 @@ def train(p):
         'batch_size': p.BATCH_SIZE,
         'shuffle': True}
     # --- package_parameters for validation generator
-    params_val = {
+    params_val = { \
         'partitions': data,
         'keys': ["img", "masks"],
         'pfold': p.PATH_FOLD['validation'],
