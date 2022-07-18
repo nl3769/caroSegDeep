@@ -1,52 +1,44 @@
-from package_parameters.parameters_caro_seg_deep_training import Parameters
 import os
 from shutil import copyfile
 
-# ****************************************************************
-# *** HOWTO
-# ****************************************************************
-# 0) Do not modify this template file "setParameterstemplate.py"
-# 1) Create a new copy of this file "setParametersTemplate.py" and rename it into "setParameters.py"
-# 2) Indicate all the variables according to your local environment and experiment
-# 3) Use your own "setParameters.py" file to run the code
-# 4) Do not commit/push your own "setParameters.py" file to the collective repository, it is not relevant for other people
-# 5) The untracked file "setParameters.py" is automatically copied to the tracked file "getParameters.py" for reproductibility
-# ****************************************************************
-
-def create_directory(path):
-
-  try:
-    os.makedirs(path)
-  except OSError:
-    print("The directory %s already exists." % path)
-  else:
-    print("Successfully created the directory %s " % path)
+from package_utils.check_dir                            import chek_dir
+from package_parameters.parameters_caro_seg_deep_training import Parameters
 
 def setParameters():
 
   p = Parameters(
+
     # --- relative to the training phase
-    NB_EPOCH=150,                                 # Number of training epochs
-    NBPATIENCE_EPOCHS=30,                        # The training is stopped if the loss on validation data does not improve after NBPATIENCE_EPOCHS epochs
-    BATCH_SIZE=16,                                # select the batch size
-    DATA_AUGMENTATION=True,                       # True to apply data augmentation on training sets only
-    MODEL_SELECTION='custom_dilated_unet',        # The name of the desired architecture
-    LEARNING_RATE=0.001,                          # The starting value of the learning rate
-    LOSS='dice_bce_loss',                         # The desired loss function
-    PATH_TO_SAVE_PREDICTION_DURING_TRAINING='/home/laine/Desktop/TestCaroSegDeep/trainingTest', # An image is predicted at the end of an epoch during training, and will be saved in the specified path.
-    PATCH_HEIGHT=512,  # The height of a patch
-    PATCH_WIDTH=128,  # The width of a patch
+    NB_EPOCH                                          = 300,                                                                # Number of training epochs
+    NBPATIENCE_EPOCHS                                 = 50,                                                                # Stop training if validation loss is not improve after NBPATIENCE_EPOCHS epochs
+    BATCH_SIZE                                        = 16,                                                                # Batch size
+    DATA_AUGMENTATION                                 = True,                                                              # Apply data augmentation on training sets only
+    MODEL_SELECTION                                   = 'custom_dilated_unet',                                             # Select architecture
+    LEARNING_RATE                                     = 0.0001,                                                          # Learning rate value
+    LOSS                                              = 'dice_bce_loss',                                                   # Loss function
+    PATH_TO_SAVE_PREDICTION_DURING_TRAINING           = '/home/laine/Documents/ICCVG/FINE_TUNING/PREDICTION_TRAINING',     # One image is predicted at the end of an epoch
+    PATCH_HEIGHT                                      = 512,                                                               # The height of a patch
+    PATCH_WIDTH                                       = 128,                                                               # The width of a patch
 
     # --- relative to results
-    PATH_TO_SAVE_TENSORBOARD='/home/laine/Desktop/TestCaroSegDeep/trainingTest/TENSORBOARD/',                           # path to save tensorboard
-    PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS='/home/laine/Desktop/TestCaroSegDeep/trainingTest/PREDICTION_RESULTS/',    # where metrics/pdf are saved
-    NAME_OF_THE_EXPERIMENT='TRAINING_FULL', # name of the experiment will appear in the directories where the results are stored. !!!!!!!!! FOLD !!!!!!!!!
+    PATH_TO_SAVE_TENSORBOARD                          = '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/IN_SILICO//'
+                                                        'FINE_TUNING/TENSORBOARD/',                                        # path to save tensorboard
+    PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS          = '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/IN_SILICO//'
+                                                        'FINE_TUNING/RES/',                                                # where metrics/pdf are saved
+    NAME_OF_THE_EXPERIMENT                            = 'FINE_TUNING',
+
+    # For fine tuning
+    PATH_PRETRAINED_MODEL                             = '/home/laine/cluster/PROJECTS_IO/SEGMENTATION//'
+                                                        'CONSORTIUM_MEIBURGER/CARO_SEG_DEEP/RESULTS//'
+                                                        'prediction_results/f0_MEIBURGER_01/custom_dilated_unet.h5',      # path to lad pretrained model
 
     # --- relative to data
-    PATH_TO_DATASET='/home/laine/Desktop/TestCaroSegDeep/CUBS_wall.h5', # Path where dataset in .h5 is saved
-    PATH_FOLD={'training': '/home/laine/cluster/PROJECTS_IO/DATA/MEIBURGER/FOLD_TRAINING_FULL/TrainList.txt',
-               'validation': '/home/laine/cluster/PROJECTS_IO/DATA/MEIBURGER/FOLD_TRAINING_FULL/ValList.txt',
-               'testing': '/home/laine/cluster/PROJECTS_IO/DATA/MEIBURGER/FOLD_TRAINING_FULL/TestList.txt'}
+    PATH_TO_DATASET                                   = '/home/laine/Documents/PROJECTS_IO/SEGMENTATION//'
+                                                        'IN_SILICO/DATASET/SILICO_wall.h5',                               # Path where dataset in .h5 is saved
+    PATH_FOLD                                         ={ \
+      'training'   : '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/IN_SILICO/DATASET/set/training_patients.txt',
+      'validation' : '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/IN_SILICO/DATASET/set/validation_patients.txt',
+      'testing'    : '/home/laine/Documents/PROJECTS_IO/SEGMENTATION/IN_SILICO/DATASET/set/testing_patients.txt'}                                                              # Path to fold
   )
 
   # --- Print all attributes in the console
@@ -55,18 +47,8 @@ def setParameters():
   print('----------------------------------------------------------------')
 
   # --- Make copy in results directory in order to track package_parameters
-  create_directory(os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT))
+  chek_dir(os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT))
   copyfile(os.path.join('package_parameters', os.path.basename(__file__)),
            os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT, 'get_parameters_training.py'))  # we also copy the retained package_parameters in the results
-  # --- Modify the function name from "setParameters" to "getParameters"
-  fid = open(os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT, 'get_parameters_training.py'), 'rt')
-  data = fid.read()
-  data = data.replace('setParameters()', 'getParameters()')
-  fid.close()
-  fid = open(os.path.join(p.PATH_TO_SAVE_RESULTS_PDF_METRICS_WEIGHTS, p.NAME_OF_THE_EXPERIMENT, 'get_parameters_training.py'),
-             'wt')
-  fid.write(data)
-  fid.close()
-
   # --- Return populated object from Parameters class
   return p
